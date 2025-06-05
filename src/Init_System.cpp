@@ -64,6 +64,7 @@ void InitSystem::initializeSensorsAndFilters() {
     InitSystem::calibrateDistanceSensor();
     DEBUG_PRINT("Laser Offset (mm): "); DEBUG_PRINTLN(distanceOffset);
 
+
     // --- 5) Erster Höhenmess‐Schritt & init Kalman / EKF --
     float tiltRad = InitSystem::getTiltAngleRad();
     // Einzelmessung vom Laser abrufen
@@ -72,6 +73,7 @@ void InitSystem::initializeSensorsAndFilters() {
     kalmanState      = height0;
     kalmanCovariance = 1.0f;
     sensorsEkfInit(height0 / 1000.0f, tiltRad);
+
     DEBUG_PRINT("Initial Height (mm): "); DEBUG_PRINTLN(height0);
 }
 

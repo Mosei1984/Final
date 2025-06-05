@@ -1,9 +1,11 @@
 // KinematicMode.cpp
 
+
 #include "Kinematic_Mode.h"
 #include "Robo_Config_V1.h" // displayPtr
 #include "Debug.h"
 #include "Sensors.h"
+
 
 // =============================================================================
 // Interne State-Variablen
@@ -16,9 +18,11 @@ static bool inSetPosition = false;
 static bool inGoToPosition = false;
 
 // Navigationsvorher (damit nur Flankenbewegungen zählen)
+r
 static int8_t prevNavY = 0;
 static bool   prevButton1 = false;
 static bool   prevButton2 = false;
+
 
 // Aktuelle Zielkoordinaten in Metern (X, Y, Z)
 static double targetPos[3] = {0.0, 0.0, 0.0};
@@ -36,11 +40,13 @@ static const double STEPS_PER_RAD = ((double)BASE_STEPS) / (2.0 * M_PI);
 // kinematicModeInit()
 // =============================================================================
 void kinematicModeInit() {
+
     currentSub       = 0;
     prevNavY         = 0;
     prevButton1      = false;
     prevButton2      = false;
     inSetPosition    = false;
+
     inGoToPosition   = false;
     sensorsEnabled   = false;
 
@@ -85,6 +91,7 @@ bool areSensorsEnabled() {
 // =============================================================================
 // kinematicModeUpdate()
 // =============================================================================
+
 void kinematicModeUpdate() {
     // 1) Eingänge aktualisieren
     updateRemoteInputs();
@@ -112,11 +119,15 @@ void kinematicModeUpdate() {
         targetPos[1] += rs->leftY * stepIncrement;
         targetPos[2] += rs->rightZ * stepIncrement;
 
+
+
+
         // Begrenze Zielkoordinaten z.B. [–0.5m..+0.5m]
         for (int i = 0; i < 3; i++) {
             if (targetPos[i] < -0.5) targetPos[i] = -0.5;
             if (targetPos[i] > +0.5) targetPos[i] = +0.5;
         }
+
 
         // Gebe neue Position nur aus, wenn sie sich spürbar geändert hat
         if (fabs(prevPos[0] - targetPos[0]) > 0.005 ||
@@ -155,6 +166,7 @@ void kinematicModeUpdate() {
             inSetPosition = false;
             DEBUG_PRINTLN("Set cancelled");
         }
+
         return;
     }
 
@@ -170,6 +182,7 @@ void kinematicModeUpdate() {
         }
         double solAngles[6];
         IKSettings settings;
+
         bool ok = computeInverseKinematics(targetPos, zeroOri,
                                            initialGuess, solAngles, settings);
         if (ok) {
@@ -196,6 +209,7 @@ void kinematicModeUpdate() {
         navY = +1;  // nach unten
     } else if (rs->rightY < -0.5f) {
         navY = -1;  // nach oben
+
     }
     if (navY != prevNavY) {
         if (navY == -1) {
@@ -207,6 +221,7 @@ void kinematicModeUpdate() {
         DEBUG_PRINTLN(currentSub);
     }
     prevNavY = navY;
+
 
     // Auswahl mit Button1
     if (pressed1) {
@@ -232,6 +247,7 @@ void kinematicModeUpdate() {
                 inGoToPosition = true;
                 DEBUG_PRINTLN("Execute IK move");
                 break;
+
             case KS_KIN_BACK:
                 // Beende Kinematic Mode
                 kinematicModeStop();
