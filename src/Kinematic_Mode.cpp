@@ -115,12 +115,14 @@ void kinematicModeUpdate() {
         if (pressed1) {
             inSetPosition  = false;
             inGoToPosition = true;
-            Serial.println("Set complete -> GoTo");
+
         }
         // Abbrechen mit Button2: zurück ins Untermenü
         if (pressed2) {
             inSetPosition = false;
+
             Serial.println("Set cancelled");
+
         }
         return;
     }
@@ -163,6 +165,15 @@ void kinematicModeUpdate() {
         navY = +1;  // nach unten
     } else if (rs->rightY < -0.5f) {
         navY = -1;  // nach oben
+
+    }
+    if (navY != prevNavY) {
+        if (navY == -1) {
+            currentSub = (currentSub - 1 + KS_COUNT) % KS_COUNT;
+        } else if (navY == +1) {
+            currentSub = (currentSub + 1) % KS_COUNT;
+        }
+
     }
     if (navY != prevNavY) {
         if (navY == -1) {
@@ -177,6 +188,7 @@ void kinematicModeUpdate() {
 
     // Auswahl mit Button1
     if (pressed1) {
+
         switch (currentSub) {
             case KS_SENSORS_TOGGLE:
                 sensorsEnabled = !sensorsEnabled;
@@ -191,6 +203,18 @@ void kinematicModeUpdate() {
                 inGoToPosition = true;
                 Serial.println("Execute IK move");
                 break;
+
+        switch (currentSub) {
+            case KS_SENSORS_TOGGLE:
+                sensorsEnabled = !sensorsEnabled;
+                break;
+            case KS_SET_POSITION:
+                inSetPosition = true;
+                break;
+            case KS_GOTO_POSITION:
+                inGoToPosition = true;
+                break;
+
             case KS_KIN_BACK:
                 // Beende Kinematic Mode
                 kinematicModeStop();
