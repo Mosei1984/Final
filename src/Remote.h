@@ -9,12 +9,7 @@
 // Schwelle für Menünavigation per Joystick
 constexpr float JOY_NAV_THRESHOLD = 0.5f;
 
-// =====================
-// Pin-Definitionen
-// =====================
-// Die konkreten Pin-Werte werden in `Robo_Config_V1.h` als `constexpr`
-// Konstanten definiert. Daher benoetigt dieses Modul hier keine eigenen
-// Deklarationen mehr.
+
 
 // =====================
 // Strukturen & Datentypen
