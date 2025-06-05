@@ -34,7 +34,6 @@ constexpr float WRIST_PITCH_MAX_DEG    =  180.0f;
 // wir einen definierten Wiederanlauf-Punkt haben.
 // Der konkrete Wert ist in Robo_Config_V1.h als HOMING_BACKOFF_STEPS festgelegt.
 //
-
 // --- Backoff- und Timeout-Parameter ---
 // Wie viele Schritte sollen wir nach Endschalter-Erkennung zurueckfahren, damit
 // wir einen definierten Wiederanlauf-Punkt haben.

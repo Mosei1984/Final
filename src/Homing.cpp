@@ -21,6 +21,7 @@ bool isEndstopPressed(uint8_t axis) {
 
 
 
+
 // ----------------------------------------------------------------------------
 // Setzt AccelStepper-Positionszähler auf offsetSteps
 // ----------------------------------------------------------------------------
@@ -38,6 +39,7 @@ static void setStepperPositionToOffset(uint8_t axis, long offsetSteps) {
 bool homeAxis(uint8_t axis) {
     DEBUG_PRINT("Homing axis ");
     DEBUG_PRINTLN(axis);
+    pinMode(ENDSTOP_PINS[axis], INPUT_PULLUP);
 
     // 1) Homingfahrt starten
     float fastSpeed = HOMING_FAST_SPEED;
@@ -142,6 +144,7 @@ bool homeAxis(uint8_t axis) {
 
 
 
+
 // ----------------------------------------------------------------------------
 // Homing aller Achsen (0..3) und anschließende Kalibrierpose
 // ----------------------------------------------------------------------------
@@ -152,6 +155,7 @@ bool homeAllAxes() {
     for (uint8_t i = 0; i < 6; i++) {
         pinMode(ENDSTOP_PINS[i], INPUT_PULLUP);
     }
+
 
 
 
@@ -176,6 +180,7 @@ bool homeAllAxes() {
     DEBUG_PRINTLN("Homing sequence done");
     return true;
 }
+
 
 
 

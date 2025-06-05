@@ -1,10 +1,12 @@
 // main.cpp
 
 #include <Arduino.h>
+
 #include <U8g2lib.h>
 #include <IntervalTimer.h>
 #include <Adafruit_NeoPixel.h>
 #include <Wire.h>
+
 
 #include "Robo_Config_V1.h"
 #include "Remote.h"
@@ -23,8 +25,7 @@
 // -----------------------------------------------------------------------------
 
 // OLED-Display (SSD1306 I²C, Full-Buffer)
-U8G2_SSD1306_128X64_NONAME_F_HW_I2C* oled;
-
+static U8G2_SSD1306_128X64_NONAME_F_HW_I2C oled(U8G2_R0, U8X8_PIN_NONE);
 
 // Timer für die STEP-ISR (2 kHz)
 IntervalTimer stepTimer;
@@ -51,8 +52,10 @@ Adafruit_NeoPixel pixels(NUM_PIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 // Flag, um nach einem Modus zurück ins Menü zu springen
 static bool returnToMenu = false;
 
+
 // Aktueller System-Status (für LEDs)
 static SystemStatus currentStatus = STATUS_IDLE;
+
 
 // -----------------------------------------------------------------------------
 // LED-Status-Funktion
@@ -97,6 +100,18 @@ void setStatusLED(SystemStatus s) {
     pixels.setPixelColor(i, color);
   }
   pixels.show();
+}
+
+// Kleine Hilfsfunktion, um eine zweizeilige Meldung auf dem Display anzuzeigen
+static void showMessage(const char* line1, const char* line2) {
+  if (!displayPtr) return;
+  displayPtr->clearBuffer();
+  displayPtr->setFont(u8g2_font_ncenB08_tr);
+  displayPtr->setCursor(0, 20);
+  displayPtr->print(line1);
+  displayPtr->setCursor(0, 40);
+  displayPtr->print(line2);
+  displayPtr->sendBuffer();
 }
 
 // Kleine Hilfsfunktion, um eine zweizeilige Meldung auf dem Display anzuzeigen
@@ -277,10 +292,13 @@ static void handleHomingSub(int8_t subIndex) {
   currentStatus = STATUS_IDLE;
   setStatusLED(currentStatus);
 }
+
+
 // -----------------------------------------------------------------------------
 // setup()
 // -----------------------------------------------------------------------------
 void setup() {
+
   Serial.begin(115200);
   delay(200);
 
@@ -288,10 +306,11 @@ void setup() {
   Wire.begin();
 
   // --- 1) Display initialisieren ---
-  oled = new U8G2_SSD1306_128X64_NONAME_F_HW_I2C(U8G2_R0, U8X8_PIN_NONE);
-  oled->setI2CAddress(DISPLAY_I2C_ADDR << 1);
-  oled->begin();
-  displayPtr = oled;
+  oled.setI2CAddress(DISPLAY_I2C_ADDR << 1);
+  oled.begin();
+  displayPtr = &oled;
+  DEBUG_PRINTLN("OLED ready");
+
 
   // --- 2) NeoPixel initialisieren ---
   pixels.begin();
@@ -333,6 +352,7 @@ void loop() {
 
 
 
+
   // 2) Wenn eine Menü-Auswahl vorliegt, handle sie
   if (menuSelectionAvailable()) {
     MenuSelection sel = menuGetSelection();
@@ -347,6 +367,7 @@ void loop() {
     else if (sel.mainIndex == MM_JOINT) {
       currentStatus = STATUS_JOINT;
       setStatusLED(currentStatus);
+
 
       showMessage("Joint Mode", "Button2=Back");
       jointModeInit();
@@ -369,6 +390,7 @@ void loop() {
     else if (sel.mainIndex == MM_KINEMATIC) {
       currentStatus = STATUS_KINEMATIC;
       setStatusLED(currentStatus);
+
 
       showMessage("Kinematic", "Button2=Back");
       kinematicModeInit();
