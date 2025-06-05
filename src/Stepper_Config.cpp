@@ -83,21 +83,6 @@ void stopAllSteppers() {
 }
 
 void stepperISR() {
-    // ===== Koordinierte MultiStepper-Bewegung =====
-    if (multiMoveActive) {
-        multiStepperGroup.runSpeedToPosition();
-        bool stillMoving = false;
-        for (uint8_t i = 0; i < 6; i++) {
-            if (motors[i].distanceToGo() != 0) {
-                stillMoving = true;
-                break;
-            }
-        }
-        if (!stillMoving) {
-            multiMoveActive = false;
-        }
-    }
-
     // ===== Einzelachsen (JointMode) – STEP-Pulse =====
     unsigned long now = micros();
     for (uint8_t i = 0; i < 6; i++) {
