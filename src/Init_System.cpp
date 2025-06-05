@@ -10,9 +10,9 @@
 // Globale Objekte & Variablen
 // =====================
 
-// ADXL345: ID 12345 (Arbitrary)
-Adafruit_ADXL345_Unified adxl = Adafruit_ADXL345_Unified(12345);
-
+// =====================
+// InitSystem::initializeSensorsAndFilters()
+// =====================
 // VL53L0X
 Adafruit_VL53L0X lox;
 
@@ -109,10 +109,20 @@ void InitSystem::calibrateAccelerometer() {
 // =====================
 
 void InitSystem::calibrateDistanceSensor() {
-    const int N = 100;
-    uint32_t sumDist = 0;
-    for (int i = 0; i < N; i++) {
-        uint16_t raw = lox.readRange();
+float InitSystem::getCorrectedLaserHeight(float tiltRad) {
+    float h = d * cosf(tiltRad);
+    return h;
+}
+
+// =====================
+// InitSystem::isLaserReady()
+// =====================
+
+bool InitSystem::isLaserReady() {
+    VL53L0X_RangingMeasurementData_t measure;
+    lox.rangingTest(&measure, false);
+    return measure.RangeStatus != 4; // 4 indicates out of range
+}
         sumDist += raw;
         delay(5);
     }

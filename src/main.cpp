@@ -10,6 +10,7 @@
 #include "Menu.h"
 #include "Joint_Mode.h"
 #include "Kinematic_Mode.h"
+#include "Init_System.h"
 #include "Homing.h"
 #include "Stepper_Config.h"
 #include "SystemStatus.h"
@@ -147,11 +148,14 @@ static void showMessage(const char* line1, const char* line2) {
   displayPtr->clearBuffer();
   displayPtr->setFont(u8g2_font_ncenB08_tr);
   displayPtr->setCursor(0, 20);
-  displayPtr->print(line1);
-  displayPtr->setCursor(0, 40);
-  displayPtr->print(line2);
-  displayPtr->sendBuffer();
-}
+  // --- 4) Sensoren initialisieren ---
+  InitSystem::initializeSensorsAndFilters();
+
+  // --- 5) Stepper initialisieren ---
+  configureSteppers();
+  setupMultiStepper();
+  // --- 6) STEP-Timer (2 kHz) ---
+  // --- 7) Menü initialisieren ---
 
 // -----------------------------------------------------------------------------
 // Wrapper für Homing-Untermenüaktionen

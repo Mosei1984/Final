@@ -84,21 +84,6 @@ void stopAllSteppers() {
 
 void stepperISR() {
     // ===== Einzelachsen (JointMode) – STEP-Pulse =====
-    unsigned long now = micros();
-    for (uint8_t i = 0; i < 6; i++) {
-        if (targetSpeeds[i] != 0.0f && stepInterval[i] > 0) {
-            if ((now - lastStepMicros[i]) >= stepInterval[i]) {
-                stepPinState[i] = !stepPinState[i];
-                digitalWrite(STEP_PINS[i], stepPinState[i] ? HIGH : LOW);
-                lastStepMicros[i] = now;
-            }
-        }
-    }
-}
-
-void setStepperSpeed(uint8_t axis, float speed) {
-    if (axis >= 6) return;
-    noInterrupts();
     if (speed == 0.0f) {
         targetSpeeds[axis] = 0.0f;
         stepInterval[axis] = 0;
