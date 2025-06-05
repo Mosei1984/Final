@@ -1,6 +1,7 @@
 // JointMode.cpp
 
 #include "Joint_Mode.h"
+#include "Robo_Config_V1.h" // fuer displayPtr
 
 // =====================
 // Interne State-Variablen
@@ -49,20 +50,19 @@ void jointModeUpdate() {
     //    readNavDirectionY analog: über 0.5 → –1 (oben), unter –0.5 → +1 (unten)
     int8_t navY = 0;
     if (rs->rightY > 0.5f) {
-        navY = -1;  // joystick nach oben → Auswahl nach oben
-    } else if (rs->rightY < -0.5f) {
         navY = +1;  // joystick nach unten → Auswahl nach unten
+    } else if (rs->rightY < -0.5f) {
+        navY = -1;  // joystick nach oben → Auswahl nach oben
     }
 
     if (navY != prevSelectNavY) {
-        // Flankenwechsel erkannt: nur dann aktualisieren
         if (navY == -1) {
-            // nach oben: vorherige Achse (mit Wrap-Around)
             selectedAxis = (selectedAxis - 1 + 6) % 6;
         } else if (navY == +1) {
-            // nach unten: nächste Achse
             selectedAxis = (selectedAxis + 1) % 6;
         }
+        Serial.print("Select axis: ");
+        Serial.println(selectedAxis);
     }
     prevSelectNavY = navY;
 
@@ -82,6 +82,16 @@ void jointModeUpdate() {
     // Setze Geschwindigkeit für selektierte Achse
     setStepperSpeed((uint8_t)selectedAxis, targetSpeed);
 
-    // 4) (Optional) Anzeige der aktuell selektierten Achse & Geschwindigkeit
-    //    Hier nicht gezeichnet – Anzeige übernimmt ggf. ein separater Display-Handler.
+    // 4) Einfache Anzeige der aktuell selektierten Achse & Geschwindigkeit
+    if (displayPtr) {
+        displayPtr->clearBuffer();
+        displayPtr->setFont(u8g2_font_ncenB08_tr);
+        displayPtr->setCursor(0, 16);
+        displayPtr->print("Axis: ");
+        displayPtr->print(selectedAxis);
+        displayPtr->setCursor(0, 32);
+        displayPtr->print("Speed: ");
+        displayPtr->print(targetSpeed, 0);
+        displayPtr->sendBuffer();
+    }
 }
