@@ -30,7 +30,7 @@ static void setStepperPositionToOffset(uint8_t axis, long offsetSteps) {
 // 2) Backoff um HOMING_BACKOFF_STEPS
 // 3) Interne Position auf HOMEPOS_DEG-Offset setzen und currentJointAngles aktualisieren
 // ----------------------------------------------------------------------------
-void homeAxis(uint8_t axis) {
+bool homeAxis(uint8_t axis) {
     DEBUG_PRINT("Homing axis ");
     DEBUG_PRINTLN(axis);
     // 1) Homingfahrt starten
@@ -47,9 +47,14 @@ void homeAxis(uint8_t axis) {
     // Motor aktivieren (Enable LOW)
     digitalWrite(ENABLE_PINS[axis], LOW);
 
-    // Solange fahren, bis Endstop auslöst
+    unsigned long startTime = millis();
     while (!isEndstopPressed(axis)) {
         motors[axis].runSpeed();
+        if ((millis() - startTime) > MAX_HOMING_TIME_MS) {
+            DEBUG_PRINTLN("Homing timeout");
+            digitalWrite(ENABLE_PINS[axis], HIGH);
+            return false;
+        }
     }
 
     // 2) Endstop erkannt: anhalten, kurze Pause, dann Backoff
@@ -115,12 +120,13 @@ void homeAxis(uint8_t axis) {
     DEBUG_PRINT("Axis ");
     DEBUG_PRINT(axis);
     DEBUG_PRINTLN(" homed");
+    return true;
 }
 
 // ----------------------------------------------------------------------------
 // Homing aller Achsen (0..3) und anschließende Kalibrierpose
 // ----------------------------------------------------------------------------
-void homeAllAxes() {
+bool homeAllAxes() {
     DEBUG_PRINTLN("Starting homing sequence");
     // Endstop-Pins auf INPUT_PULLUP
     for (uint8_t i = 0; i < 6; i++) {
@@ -128,10 +134,10 @@ void homeAllAxes() {
     }
 
     // Homing Reihenfolge
-    homeAxis(0);
-    homeAxis(1);
-    homeAxis(2);
-    homeAxis(3);
+    if (!homeAxis(0)) return false;
+    if (!homeAxis(1)) return false;
+    if (!homeAxis(2)) return false;
+    if (!homeAxis(3)) return false;
     // Optional: homing für 4, 5, falls benötigt:
     // homeAxis(4);
     // homeAxis(5);
@@ -139,6 +145,7 @@ void homeAllAxes() {
     // Anschließend in Kalibrierpose fahren
     moveToCalibrationPose();
     DEBUG_PRINTLN("Homing sequence done");
+    return true;
 }
 
 // ----------------------------------------------------------------------------

@@ -91,10 +91,14 @@ void kinematicModeUpdate() {
     updateRemoteInputs();
     const RemoteState* rs = getRemoteStatePointer();
     if (sensorsEnabled) {
+        static unsigned long lastPrint = 0;
         double zF, pitchF;
         sensorsEkfUpdate(zF, pitchF);
-        DEBUG_PRINT("Zf:"); DEBUG_PRINT(zF);
-        DEBUG_PRINT(" pitch:"); DEBUG_PRINTLN(pitchF);
+        if (millis() - lastPrint > 200) {
+            DEBUG_PRINT("Zf:"); DEBUG_PRINT(zF);
+            DEBUG_PRINT(" pitch:"); DEBUG_PRINTLN(pitchF);
+            lastPrint = millis();
+        }
     }
     bool pressed1 = rs->button1 && !prevButton1;
     bool pressed2 = rs->button2 && !prevButton2;

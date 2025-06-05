@@ -110,23 +110,36 @@ static void handleHomingSub(int8_t subIndex) {
   setStatusLED(currentStatus);
   stopStepTimer();
   showMessage("Homing...", "");
+  bool success = true;
 
   switch (subIndex) {
     case HS_SINGLE_AXIS:
       // Homing jeder Achse einzeln (0..5)
       for (uint8_t i = 0; i < 6; i++) {
-        homeAxis(i);
+        if (!homeAxis(i)) {
+          showMessage("Homing", "timeout");
+          success = false;
+          break;
+        }
       }
       break;
 
     case HS_ALL_AXES:
       // Homing aller Achsen (0..3, optional 4/5) und Kalibrierpose
-      homeAllAxes();
+      if (!homeAllAxes()) {
+        showMessage("Homing", "timeout");
+        success = false;
+        break;
+      }
       break;
 
     case HS_MOVE_INIT_POS:
       // Homing + Initialposition anfahren
-      homeAllAxes();
+      if (!homeAllAxes()) {
+        showMessage("Homing", "timeout");
+        success = false;
+        break;
+      }
       {
         long initSteps[6] = {0, 0, 0, 0, 0, 0};
         moveToPositionsAsync(initSteps);
@@ -137,15 +150,21 @@ static void handleHomingSub(int8_t subIndex) {
       break;
 
     case HS_AUTO_HOMING:
-      // Auto-Homing und Kalibrierpose (moveToCalibrationPose integrier t)
-      homeAllAxes();
+      // Auto-Homing und Kalibrierpose (moveToCalibrationPose integriert)
+      if (!homeAllAxes()) {
+        showMessage("Homing", "timeout");
+        success = false;
+        break;
+      }
       break;
 
     default:
       break;
   }
 
-  showMessage("Homing", "done");
+  if (success) {
+    showMessage("Homing", "done");
+  }
   startStepTimer();
   currentStatus = STATUS_IDLE;
   setStatusLED(currentStatus);
