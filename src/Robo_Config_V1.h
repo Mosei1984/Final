@@ -23,6 +23,11 @@ constexpr uint32_t BASE_STEPS = STEPS_PER_REVOLUTION * MICROSTEPPING;
 constexpr float DEFAULT_MAX_SPEED    = 1000.0f;
 constexpr float DEFAULT_ACCELERATION = 2000.0f;
 
+// --- I2C-Adressen (7-bit, ohne R/W-Bit) ---
+constexpr uint8_t DISPLAY_I2C_ADDR  = 0x3C; // SSD1306 OLED
+constexpr uint8_t ADXL345_I2C_ADDR  = 0x53; // Beschleunigungssensor
+constexpr uint8_t VL53L0X_I2C_ADDR  = 0x29; // Laser-Distanzsensor
+
 // --- PIN-Zuweisungen für Stepper (jeweils DRIVER-Modus) ---
 // Jeder Achse hat einen eindeutigen STEP-Pin.
 constexpr uint8_t STEP_PINS[6]   = {  2,  5,  8,  18, 11, 14 };

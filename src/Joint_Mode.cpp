@@ -50,12 +50,13 @@ void jointModeUpdate() {
     const RemoteState* rs = getRemoteStatePointer();
 
     // 2) Achsenauswahl über rechten Joystick Y-Achse
-    //    readNavDirectionY analog: über 0.5 → –1 (oben), unter –0.5 → +1 (unten)
 
+    //    readNavDirectionY analog: über JOY_NAV_THRESHOLD → –1 (oben)
+    //    bzw. unter –JOY_NAV_THRESHOLD → +1 (unten)
     int8_t navY = 0;
-    if (rs->rightY > 0.5f) {
+    if (rs->rightY > JOY_NAV_THRESHOLD) {
         navY = +1;  // joystick nach unten → Auswahl nach unten
-    } else if (rs->rightY < -0.5f) {
+    } else if (rs->rightY < -JOY_NAV_THRESHOLD) {
         navY = -1;  // joystick nach oben → Auswahl nach oben
     }
 

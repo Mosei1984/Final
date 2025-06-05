@@ -125,12 +125,6 @@ void kinematicModeUpdate() {
         targetPos[2] += rs->rightZ * stepIncrement;
 
 
-
-
-
-
-
-
         // Begrenze Zielkoordinaten z.B. [–0.5m..+0.5m]
         for (int i = 0; i < 3; i++) {
             if (targetPos[i] < -0.5) targetPos[i] = -0.5;
@@ -214,11 +208,10 @@ void kinematicModeUpdate() {
     // 4) Normaler Untermenü-Navigationsmodus
     // Rechter Joystick Y steuert Untermenü-Auswahl
     int8_t navY = 0;
-    if (rs->rightY > 0.5f) {
+    if (rs->rightY > JOY_NAV_THRESHOLD) {
         navY = +1;  // nach unten
-    } else if (rs->rightY < -0.5f) {
+    } else if (rs->rightY < -JOY_NAV_THRESHOLD) {
         navY = -1;  // nach oben
-
     }
     if (navY != prevNavY) {
         if (navY == -1) {
@@ -230,7 +223,6 @@ void kinematicModeUpdate() {
         DEBUG_PRINTLN(currentSub);
     }
     prevNavY = navY;
-
 
     // Auswahl mit Button1
     if (pressed1) {

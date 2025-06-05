@@ -40,23 +40,21 @@ static inline float deg2rad(float deg) {
 // =====================
 
 void InitSystem::initializeSensorsAndFilters() {
+
     // --- 1) ADXL345 initialisieren ---
-    if (!adxl.begin()) {
-
+    if (!adxl.begin(ADXL345_I2C_ADDR)) {
         DEBUG_PRINTLN("Fehler: ADXL345 nicht gefunden!");
-
         while (1) { delay(1000); }
     }
     adxl.setRange(ADXL345_RANGE_4_G);
     delay(50);
 
     // --- 2) VL53L0X initialisieren ---
-    if (!lox.begin()) {
-
+    if (!lox.begin(VL53L0X_I2C_ADDR, false, &Wire)) {
         DEBUG_PRINTLN("Fehler: VL53L0X nicht gefunden!");
-
         while (1) { delay(1000); }
     }
+
     // setze Messmodus auf Einzelmessung (wird bei Bedarf aufgerufen)
     delay(50);
 
@@ -148,6 +146,16 @@ float InitSystem::getCorrectedLaserHeight(float tiltRad) {
     if (d < 0.0f) d = 0.0f;
     float h = d * cosf(tiltRad);
     return h;
+}
+
+// =====================
+// InitSystem::isLaserReady()
+// =====================
+
+bool InitSystem::isLaserReady() {
+    VL53L0X_RangingMeasurementData_t measure;
+    lox.rangingTest(&measure, false);
+    return measure.RangeStatus != 4; // 4 indicates out of range
 }
 
 // =====================

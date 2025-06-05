@@ -6,6 +6,10 @@
 #include <Arduino.h>
 #include "Robo_Config_V1.h"  // Enthält joyLXCenter, joyLYCenter, joyRZCenter, joyRYawCenter, DEADZONE, SERVO_POT_PIN
 
+// Schwelle für Menünavigation per Joystick
+constexpr float JOY_NAV_THRESHOLD = 0.5f;
+
+
 
 // =====================
 // Strukturen & Datentypen

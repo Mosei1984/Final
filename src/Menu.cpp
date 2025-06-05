@@ -20,6 +20,7 @@ static bool inKinematicSub   = false;
 static int8_t currentKinematicSub = 0;
 
 // Joystick-Vorzustände für Auf-/Ab-Bewegung (–1,0,+1)
+
 static int8_t prevMainNavY = 0;
 static int8_t prevSubNavY  = 0;
 static bool   prevButton1  = false;
@@ -39,10 +40,11 @@ static int8_t readNavDirectionY(float rawValue) {
     // Positive Werte entsprechen Joystick nach unten,
     // negative Werte Joystick nach oben. Wir geben
     // +1 fuer "nach unten" und -1 fuer "nach oben" zurueck.
-    if (rawValue > 0.5f)  return +1; // nach unten
-    if (rawValue < -0.5f) return -1; // nach oben
+    if (rawValue > JOY_NAV_THRESHOLD)  return +1; // nach unten
+    if (rawValue < -JOY_NAV_THRESHOLD) return -1; // nach oben
     return 0;
 }
+
 
 // =============================================================================
 // menuInit()
@@ -61,6 +63,7 @@ void menuInit() {
     choiceMade = false;
     finalSelection = { -1, -1 };
 }
+
 
 // =============================================================================
 // menuSelectionAvailable()
@@ -128,6 +131,7 @@ static void drawMainMenu() {
 
 
 
+
 // =============================================================================
 // Zeichnet das Homing-Untermenü
 // =============================================================================
@@ -165,11 +169,6 @@ static void drawHomingSubMenu() {
     displayPtr->sendBuffer();
 }
 
-
-
-
-
-
 // =============================================================================
 // Zeichnet das Kinematic-Untermenü
 // =============================================================================
@@ -206,11 +205,6 @@ static void drawKinematicSubMenu() {
     displayPtr->sendBuffer();
 }
 
-
-
-
-
-
 // =============================================================================
 // menuUpdate()
 // =============================================================================
@@ -244,7 +238,6 @@ void menuUpdate() {
             }
         }
         prevMainNavY = dirY;
-
 
         // Auswahl per Button1 (Flanke)
         if (pressed1) {
@@ -352,6 +345,7 @@ void menuUpdate() {
             prevSubNavY = 0;
             DEBUG_PRINTLN("Kinematic menu exit");
         }
+
 
         drawKinematicSubMenu();
         return;

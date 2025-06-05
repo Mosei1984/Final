@@ -1,4 +1,5 @@
 
+
 #include "Homing.h"  // Enthält MICROSTEPPING usw.
 #include "Debug.h"
 
@@ -17,6 +18,7 @@ static inline float deg2rad(float deg) {
 bool isEndstopPressed(uint8_t axis) {
     return (digitalRead(ENDSTOP_PINS[axis]) == HIGH);
 }
+
 
 
 // ----------------------------------------------------------------------------
@@ -61,6 +63,7 @@ bool homeAxis(uint8_t axis) {
             return false;
         }
     }
+
 
 
 
@@ -138,6 +141,7 @@ bool homeAxis(uint8_t axis) {
 
 
 
+
 // ----------------------------------------------------------------------------
 // Homing aller Achsen (0..3) und anschließende Kalibrierpose
 // ----------------------------------------------------------------------------
@@ -148,6 +152,7 @@ bool homeAllAxes() {
     for (uint8_t i = 0; i < 6; i++) {
         pinMode(ENDSTOP_PINS[i], INPUT_PULLUP);
     }
+
 
 
 
@@ -171,6 +176,7 @@ bool homeAllAxes() {
     DEBUG_PRINTLN("Homing sequence done");
     return true;
 }
+
 
 
 // ----------------------------------------------------------------------------
