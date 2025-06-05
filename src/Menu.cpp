@@ -50,6 +50,7 @@ static int8_t readNavDirectionY(float rawValue) {
 
 
 
+
 // =============================================================================
 // menuInit()
 // =============================================================================
@@ -67,6 +68,7 @@ void menuInit() {
     choiceMade = false;
     finalSelection = { -1, -1 };
 }
+
 
 
 
@@ -137,6 +139,7 @@ static void drawMainMenu() {
 
 
 
+
 // =============================================================================
 // Zeichnet das Homing-Untermenü
 // =============================================================================
@@ -174,6 +177,7 @@ static void drawHomingSubMenu() {
         }
     } while (displayPtr->nextPage());
 }
+
 
 
 
@@ -217,6 +221,7 @@ static void drawKinematicSubMenu() {
 
 
 
+
 // =============================================================================
 // menuUpdate()
 // =============================================================================
@@ -226,6 +231,7 @@ void menuUpdate() {
 
     // 1) Eingänge aktualisieren
     updateRemoteInputs();
+
     const RemoteState* rs = getRemoteStatePointer();
     bool pressed1 = rs->button1 && !prevButton1;
     bool pressed2 = rs->button2 && !prevButton2;

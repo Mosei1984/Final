@@ -5,6 +5,7 @@
 #include "Debug.h"
 
 
+
 // Hilfsfunktion: Grad → Radiant
 static inline float deg2rad(float deg) {
     return deg * (M_PI / 180.0f);
@@ -12,13 +13,12 @@ static inline float deg2rad(float deg) {
 
 // ----------------------------------------------------------------------------
 // Prüft, ob Endstop (INPUT_PULLUP) der Achse gedrückt ist (HIGH = gedrückt)
-
 // Die Schalter sind "NC" zu GND und oeffnen beim Druecken.
-
 // ----------------------------------------------------------------------------
 bool isEndstopPressed(uint8_t axis) {
     return (digitalRead(ENDSTOP_PINS[axis]) == HIGH);
 }
+
 
 // ----------------------------------------------------------------------------
 // Setzt AccelStepper-Positionszähler auf offsetSteps
@@ -34,7 +34,7 @@ static void setStepperPositionToOffset(uint8_t axis, long offsetSteps) {
 // 2) Backoff um HOMING_BACKOFF_STEPS
 // 3) Interne Position auf HOMEPOS_DEG-Offset setzen und currentJointAngles aktualisieren
 // ----------------------------------------------------------------------------
-void homeAxis(uint8_t axis) {
+bool homeAxis(uint8_t axis) {
     DEBUG_PRINT("Homing axis ");
     DEBUG_PRINTLN(axis);
 
@@ -52,9 +52,14 @@ void homeAxis(uint8_t axis) {
     // Motor aktivieren (Enable LOW)
     digitalWrite(ENABLE_PINS[axis], LOW);
 
-    // Solange fahren, bis Endstop auslöst
+    unsigned long startTime = millis();
     while (!isEndstopPressed(axis)) {
         motors[axis].runSpeed();
+        if ((millis() - startTime) > MAX_HOMING_TIME_MS) {
+            DEBUG_PRINTLN("Homing timeout");
+            digitalWrite(ENABLE_PINS[axis], HIGH);
+            return false;
+        }
     }
 
     // 2) Endstop erkannt: anhalten, kurze Pause, dann Backoff
@@ -123,7 +128,9 @@ void homeAxis(uint8_t axis) {
     DEBUG_PRINT("Axis ");
     DEBUG_PRINT(axis);
     DEBUG_PRINTLN(" homed");
+    return true;
 }
+
 
 
 
@@ -131,7 +138,7 @@ void homeAxis(uint8_t axis) {
 // Homing aller Achsen (0..3) und anschließende Kalibrierpose
 // ----------------------------------------------------------------------------
 
-void homeAllAxes() {
+bool homeAllAxes() {
     DEBUG_PRINTLN("Starting homing sequence");
     // Endstop-Pins auf INPUT_PULLUP
     for (uint8_t i = 0; i < 6; i++) {
@@ -140,19 +147,23 @@ void homeAllAxes() {
 
 
 
+
     // Homing Reihenfolge
-    homeAxis(0);
-    homeAxis(1);
-    homeAxis(2);
-    homeAxis(3);
+    if (!homeAxis(0)) return false;
+    if (!homeAxis(1)) return false;
+    if (!homeAxis(2)) return false;
+    if (!homeAxis(3)) return false;
     // Optional: homing für 4, 5, falls benötigt:
     // homeAxis(4);
     // homeAxis(5);
 
     // Anschließend in Kalibrierpose fahren
+
     moveToCalibrationPose();
     DEBUG_PRINTLN("Homing sequence done");
+    return true;
 }
+
 
 
 

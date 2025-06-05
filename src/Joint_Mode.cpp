@@ -87,6 +87,7 @@ void jointModeUpdate() {
     // Setze Geschwindigkeit für selektierte Achse
     setStepperSpeed((uint8_t)selectedAxis, targetSpeed);
 
+
     // 4) Einfache Anzeige der aktuell selektierten Achse & Geschwindigkeit
     if (displayPtr) {
         displayPtr->clearBuffer();

@@ -6,15 +6,6 @@
 #include <Arduino.h>
 #include "Robo_Config_V1.h"  // Enthält joyLXCenter, joyLYCenter, joyRZCenter, joyRYawCenter, DEADZONE, SERVO_POT_PIN
 
-
-// =====================
-// Pin-Definitionen
-// =====================
-// Die konkreten Pin-Werte werden in `Robo_Config_V1.h` als `constexpr`
-// Konstanten definiert. Daher benoetigt dieses Modul hier keine eigenen
-// Deklarationen mehr.
-
-
 // =====================
 // Strukturen & Datentypen
 // =====================

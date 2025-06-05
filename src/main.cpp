@@ -9,10 +9,13 @@
 #include "Remote.h"
 #include "Menu.h"
 #include "Joint_Mode.h"
+
 #include "Kinematic_Mode.h"
 #include "Homing.h"
 #include "Stepper_Config.h"
+#include "Init_System.h"
 #include "SystemStatus.h"
+
 
 // -----------------------------------------------------------------------------
 // Globale Objekte
@@ -47,15 +50,19 @@ Adafruit_NeoPixel pixels(NUM_PIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 // Flag, um nach einem Modus zurück ins Menü zu springen
 static bool returnToMenu = false;
 
+
 // Aktueller System-Status (für LEDs)
 static SystemStatus currentStatus = STATUS_IDLE;
+
 
 // -----------------------------------------------------------------------------
 // LED-Status-Funktion
 // -----------------------------------------------------------------------------
 // Setzt alle NeoPixels auf eine Farbe passend zum SystemStatus.
 // -----------------------------------------------------------------------------
+
 void setStatusLED(SystemStatus s) {
+
   uint32_t color;
   switch (s) {
     case STATUS_MENU:
@@ -153,6 +160,18 @@ static void showMessage(const char* line1, const char* line2) {
   displayPtr->sendBuffer();
 }
 
+// Kleine Hilfsfunktion, um eine zweizeilige Meldung auf dem Display anzuzeigen
+static void showMessage(const char* line1, const char* line2) {
+  if (!displayPtr) return;
+  displayPtr->clearBuffer();
+  displayPtr->setFont(u8g2_font_ncenB08_tr);
+  displayPtr->setCursor(0, 20);
+  displayPtr->print(line1);
+  displayPtr->setCursor(0, 40);
+  displayPtr->print(line2);
+  displayPtr->sendBuffer();
+}
+
 // -----------------------------------------------------------------------------
 // Wrapper für Homing-Untermenüaktionen
 // -----------------------------------------------------------------------------
@@ -162,24 +181,37 @@ static void handleHomingSub(int8_t subIndex) {
   setStatusLED(currentStatus);
   stopStepTimer();
   showMessage("Homing...", "");
+  bool success = true;
 
   switch (subIndex) {
 
     case HS_SINGLE_AXIS:
       // Homing jeder Achse einzeln (0..5)
       for (uint8_t i = 0; i < 6; i++) {
-        homeAxis(i);
+        if (!homeAxis(i)) {
+          showMessage("Homing", "timeout");
+          success = false;
+          break;
+        }
       }
       break;
 
     case HS_ALL_AXES:
       // Homing aller Achsen (0..3, optional 4/5) und Kalibrierpose
-      homeAllAxes();
+      if (!homeAllAxes()) {
+        showMessage("Homing", "timeout");
+        success = false;
+        break;
+      }
       break;
 
     case HS_MOVE_INIT_POS:
       // Homing + Initialposition anfahren
-      homeAllAxes();
+      if (!homeAllAxes()) {
+        showMessage("Homing", "timeout");
+        success = false;
+        break;
+      }
       {
         long initSteps[6] = {0, 0, 0, 0, 0, 0};
         moveToPositionsAsync(initSteps);
@@ -190,8 +222,12 @@ static void handleHomingSub(int8_t subIndex) {
       break;
 
     case HS_AUTO_HOMING:
-      // Auto-Homing und Kalibrierpose (moveToCalibrationPose integrier t)
-      homeAllAxes();
+      // Auto-Homing und Kalibrierpose (moveToCalibrationPose integriert)
+      if (!homeAllAxes()) {
+        showMessage("Homing", "timeout");
+        success = false;
+        break;
+      }
       break;
 
     default:
@@ -199,11 +235,14 @@ static void handleHomingSub(int8_t subIndex) {
 
   }
 
-  showMessage("Homing", "done");
+  if (success) {
+    showMessage("Homing", "done");
+  }
   startStepTimer();
   currentStatus = STATUS_IDLE;
   setStatusLED(currentStatus);
 }
+
 
 
 
@@ -231,17 +270,20 @@ void setup() {
   remoteInit();
   calibrateJoysticks(100);
 
-  // --- 4) Stepper initialisieren ---
+  // --- 4) Sensoren initialisieren ---
+  InitSystem::initializeSensorsAndFilters();
+
+  // --- 5) Stepper initialisieren ---
   configureSteppers();
   setupMultiStepper();
 
 
-  // --- 5) STEP-Timer (2 kHz) ---
+  // --- 6) STEP-Timer (2 kHz) ---
   // Hoehere Frequenz erlaubt schnellere Schrittgeschwindigkeiten
   startStepTimer();
 
 
-  // --- 6) Menü initialisieren ---
+  // --- 7) Menü initialisieren ---
   currentStatus = STATUS_MENU;
   setStatusLED(currentStatus);
   menuInit();
@@ -254,6 +296,7 @@ void loop() {
 
   // 1) Menü-Update (updateRemoteInputs wird in menuUpdate aufgerufen)
   menuUpdate();
+
 
   // 2) Wenn eine Menü-Auswahl vorliegt, handle sie
   if (menuSelectionAvailable()) {
@@ -292,7 +335,6 @@ void loop() {
     else if (sel.mainIndex == MM_KINEMATIC) {
       currentStatus = STATUS_KINEMATIC;
       setStatusLED(currentStatus);
-
 
       showMessage("Kinematic", "Button2=Back");
       kinematicModeInit();
