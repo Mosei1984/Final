@@ -222,6 +222,8 @@ void menuUpdate() {
                     finalSelection.mainIndex = currentMain;
                     finalSelection.subIndex = -1;
                     choiceMade = true;
+                    Serial.print("Menu select main=");
+                    Serial.println(currentMain);
                     break;
             }
         }
@@ -254,6 +256,8 @@ void menuUpdate() {
                 finalSelection.mainIndex = MM_HOMING;
                 finalSelection.subIndex = currentHomingSub;
                 choiceMade = true;
+                Serial.print("Homing select sub=");
+                Serial.println(currentHomingSub);
             }
         }
 
@@ -284,6 +288,8 @@ void menuUpdate() {
                 finalSelection.mainIndex = MM_KINEMATIC;
                 finalSelection.subIndex = currentKinematicSub;
                 choiceMade = true;
+                Serial.print("Kinematic select sub=");
+                Serial.println(currentKinematicSub);
             }
         }
 

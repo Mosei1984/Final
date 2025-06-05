@@ -93,6 +93,9 @@ void kinematicModeUpdate() {
 
     // 2) Wenn man gerade Ziel eingibt (Set Position)
     if (inSetPosition) {
+        Serial.print("Target X:"); Serial.print(targetPos[0]);
+        Serial.print(" Y:"); Serial.print(targetPos[1]);
+        Serial.print(" Z:"); Serial.println(targetPos[2]);
         // Anpassung: 
         //   - Linker Joystick X  steuert ΔX (–0.01 … +0.01 m)
         //   - Linker Joystick Y  steuert ΔY (–0.01 … +0.01 m)
@@ -112,10 +115,14 @@ void kinematicModeUpdate() {
         if (pressed1) {
             inSetPosition  = false;
             inGoToPosition = true;
+
         }
         // Abbrechen mit Button2: zurück ins Untermenü
         if (pressed2) {
             inSetPosition = false;
+
+            Serial.println("Set cancelled");
+
         }
         return;
     }
@@ -135,15 +142,19 @@ void kinematicModeUpdate() {
         bool ok = computeInverseKinematics(targetPos, zeroOri,
                                            initialGuess, solAngles, settings);
         if (ok) {
+            Serial.println("IK solution found");
             // Wandle Gelenkwinkel in Schritte: θ [rad] → steps
             long stepTargets[6];
             for (uint8_t i = 0; i < 6; i++) {
                 stepTargets[i] = (long)round(solAngles[i] * STEPS_PER_RAD);
             }
             moveToPositionsAsync(stepTargets);
+        } else {
+            Serial.println("IK failed");
         }
         // Zurück ins Untermenü
         inGoToPosition = false;
+        Serial.println("Move command sent");
         return;
     }
 
@@ -154,6 +165,7 @@ void kinematicModeUpdate() {
         navY = +1;  // nach unten
     } else if (rs->rightY < -0.5f) {
         navY = -1;  // nach oben
+
     }
     if (navY != prevNavY) {
         if (navY == -1) {
@@ -161,11 +173,37 @@ void kinematicModeUpdate() {
         } else if (navY == +1) {
             currentSub = (currentSub + 1) % KS_COUNT;
         }
+
+    }
+    if (navY != prevNavY) {
+        if (navY == -1) {
+            currentSub = (currentSub - 1 + KS_COUNT) % KS_COUNT;
+        } else if (navY == +1) {
+            currentSub = (currentSub + 1) % KS_COUNT;
+        }
+        Serial.print("Kinematic menu sub: ");
+        Serial.println(currentSub);
     }
     prevNavY = navY;
 
     // Auswahl mit Button1
     if (pressed1) {
+
+        switch (currentSub) {
+            case KS_SENSORS_TOGGLE:
+                sensorsEnabled = !sensorsEnabled;
+                Serial.print("Sensors ");
+                Serial.println(sensorsEnabled ? "on" : "off");
+                break;
+            case KS_SET_POSITION:
+                inSetPosition = true;
+                Serial.println("Set target position");
+                break;
+            case KS_GOTO_POSITION:
+                inGoToPosition = true;
+                Serial.println("Execute IK move");
+                break;
+
         switch (currentSub) {
             case KS_SENSORS_TOGGLE:
                 sensorsEnabled = !sensorsEnabled;
@@ -176,6 +214,7 @@ void kinematicModeUpdate() {
             case KS_GOTO_POSITION:
                 inGoToPosition = true;
                 break;
+
             case KS_KIN_BACK:
                 // Beende Kinematic Mode
                 kinematicModeStop();

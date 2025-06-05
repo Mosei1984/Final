@@ -55,14 +55,13 @@ void jointModeUpdate() {
     }
 
     if (navY != prevSelectNavY) {
-        // Flankenwechsel erkannt: nur dann aktualisieren
         if (navY == -1) {
-            // nach oben: vorherige Achse (mit Wrap-Around)
             selectedAxis = (selectedAxis - 1 + 6) % 6;
         } else if (navY == +1) {
-            // nach unten: nächste Achse
             selectedAxis = (selectedAxis + 1) % 6;
         }
+        Serial.print("Select axis: ");
+        Serial.println(selectedAxis);
     }
     prevSelectNavY = navY;
 
