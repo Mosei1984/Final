@@ -1,6 +1,7 @@
 // KinematicMode.cpp
 
 #include "Kinematic_Mode.h"
+#include "Robo_Config_V1.h" // displayPtr
 
 // =============================================================================
 // Interne State-Variablen
@@ -13,11 +14,9 @@ static bool inSetPosition = false;
 static bool inGoToPosition = false;
 
 // Navigationsvorher (damit nur Flankenbewegungen zählen)
-
 static int8_t prevNavY = 0;
 static bool   prevButton1 = false;
 static bool   prevButton2 = false;
-
 
 // Aktuelle Zielkoordinaten in Metern (X, Y, Z)
 static double targetPos[3] = {0.0, 0.0, 0.0};
@@ -87,6 +86,7 @@ bool areSensorsEnabled() {
 // kinematicModeUpdate()
 // =============================================================================
 
+
 void kinematicModeUpdate() {
     // 1) Eingänge aktualisieren
     updateRemoteInputs();
@@ -111,6 +111,7 @@ void kinematicModeUpdate() {
         targetPos[2] += rs->rightZ * stepIncrement;
 
 
+
         // Begrenze Zielkoordinaten z.B. [–0.5m..+0.5m]
         for (int i = 0; i < 3; i++) {
             if (targetPos[i] < -0.5) targetPos[i] = -0.5;
@@ -125,6 +126,20 @@ void kinematicModeUpdate() {
             Serial.print("Target X:"); Serial.print(targetPos[0]);
             Serial.print(" Y:"); Serial.print(targetPos[1]);
             Serial.print(" Z:"); Serial.println(targetPos[2]);
+            if (displayPtr) {
+                displayPtr->clearBuffer();
+                displayPtr->setFont(u8g2_font_ncenB08_tr);
+                displayPtr->setCursor(0, 16);
+                displayPtr->print("X:");
+                displayPtr->print(targetPos[0], 2);
+                displayPtr->setCursor(0, 32);
+                displayPtr->print("Y:");
+                displayPtr->print(targetPos[1], 2);
+                displayPtr->setCursor(0, 48);
+                displayPtr->print("Z:");
+                displayPtr->print(targetPos[2], 2);
+                displayPtr->sendBuffer();
+            }
             prevPos[0] = targetPos[0];
             prevPos[1] = targetPos[1];
             prevPos[2] = targetPos[2];
@@ -157,6 +172,7 @@ void kinematicModeUpdate() {
         }
         double solAngles[6];
         IKSettings settings;
+
 
         bool ok = computeInverseKinematics(targetPos, zeroOri,
                                            initialGuess, solAngles, settings);
@@ -212,8 +228,19 @@ void kinematicModeUpdate() {
         }
         Serial.print("Kinematic menu sub: ");
         Serial.println(currentSub);
+
+    }
+    if (navY != prevNavY) {
+        if (navY == -1) {
+            currentSub = (currentSub - 1 + KS_COUNT) % KS_COUNT;
+        } else if (navY == +1) {
+            currentSub = (currentSub + 1) % KS_COUNT;
+        }
+        Serial.print("Kinematic menu sub: ");
+        Serial.println(currentSub);
     }
     prevNavY = navY;
+
 
 
     // Auswahl mit Button1
@@ -244,6 +271,7 @@ void kinematicModeUpdate() {
             case KS_GOTO_POSITION:
                 inGoToPosition = true;
                 break;
+
 
 
             case KS_KIN_BACK:

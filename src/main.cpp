@@ -23,6 +23,14 @@ U8G2_SSD1306_128X64_NONAME_F_HW_I2C* oled;
 // Timer für die STEP-ISR (1 kHz)
 IntervalTimer stepTimer;
 
+static void startStepTimer() {
+  stepTimer.begin(stepperISR, 500);  // 2 kHz
+}
+
+static void stopStepTimer() {
+  stepTimer.end();
+}
+
 // NeoPixel-Status-LEDs
 Adafruit_NeoPixel pixels(NUM_PIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
@@ -77,12 +85,26 @@ static void setStatusLED(SystemStatus s) {
   pixels.show();
 }
 
+// Kleine Hilfsfunktion, um eine zweizeilige Meldung auf dem Display anzuzeigen
+static void showMessage(const char* line1, const char* line2) {
+  if (!displayPtr) return;
+  displayPtr->clearBuffer();
+  displayPtr->setFont(u8g2_font_ncenB08_tr);
+  displayPtr->setCursor(0, 20);
+  displayPtr->print(line1);
+  displayPtr->setCursor(0, 40);
+  displayPtr->print(line2);
+  displayPtr->sendBuffer();
+}
+
 // -----------------------------------------------------------------------------
 // Wrapper für Homing-Untermenüaktionen
 // -----------------------------------------------------------------------------
 static void handleHomingSub(int8_t subIndex) {
   currentStatus = STATUS_HOMING;
   setStatusLED(currentStatus);
+  stopStepTimer();
+  showMessage("Homing...", "");
 
   switch (subIndex) {
     case HS_SINGLE_AXIS:
@@ -118,6 +140,8 @@ static void handleHomingSub(int8_t subIndex) {
       break;
   }
 
+  showMessage("Homing", "done");
+  startStepTimer();
   currentStatus = STATUS_IDLE;
   setStatusLED(currentStatus);
 }
@@ -148,8 +172,9 @@ void setup() {
   configureSteppers();
   setupMultiStepper();
 
-  // --- 5) STEP-Timer (1 kHz) ---
-  stepTimer.begin(stepperISR, 1000);
+  // --- 5) STEP-Timer (2 kHz) ---
+  // Hoehere Frequenz erlaubt schnellere Schrittgeschwindigkeiten
+  startStepTimer();
 
   // --- 6) Menü initialisieren ---
   currentStatus = STATUS_MENU;
