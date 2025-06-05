@@ -4,6 +4,7 @@
 #include "Robo_Config_V1.h" // fuer displayPtr
 #include "Debug.h"
 
+
 // =====================
 // Interne State-Variablen
 // =====================
@@ -62,8 +63,10 @@ void jointModeUpdate() {
         } else if (navY == +1) {
             selectedAxis = (selectedAxis + 1) % 6;
         }
+
         DEBUG_PRINT("Select axis: ");
         DEBUG_PRINTLN(selectedAxis);
+
     }
     prevSelectNavY = navY;
 

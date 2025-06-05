@@ -31,8 +31,10 @@ static void setStepperPositionToOffset(uint8_t axis, long offsetSteps) {
 // 3) Interne Position auf HOMEPOS_DEG-Offset setzen und currentJointAngles aktualisieren
 // ----------------------------------------------------------------------------
 void homeAxis(uint8_t axis) {
+
     DEBUG_PRINT("Homing axis ");
     DEBUG_PRINTLN(axis);
+
     // 1) Homingfahrt starten
     float fastSpeed = HOMING_FAST_SPEED;
     if (HOMING_DIRECTION[axis]) {
@@ -112,16 +114,20 @@ void homeAxis(uint8_t axis) {
     // Motor deaktivieren (Enable HIGH)
     digitalWrite(ENABLE_PINS[axis], HIGH);
     delay(10);
+
     DEBUG_PRINT("Axis ");
     DEBUG_PRINT(axis);
     DEBUG_PRINTLN(" homed");
+
 }
 
 // ----------------------------------------------------------------------------
 // Homing aller Achsen (0..3) und anschließende Kalibrierpose
 // ----------------------------------------------------------------------------
 void homeAllAxes() {
+
     DEBUG_PRINTLN("Starting homing sequence");
+
     // Endstop-Pins auf INPUT_PULLUP
     for (uint8_t i = 0; i < 6; i++) {
         pinMode(ENDSTOP_PINS[i], INPUT_PULLUP);
@@ -138,7 +144,9 @@ void homeAllAxes() {
 
     // Anschließend in Kalibrierpose fahren
     moveToCalibrationPose();
+
     DEBUG_PRINTLN("Homing sequence done");
+
 }
 
 // ----------------------------------------------------------------------------
