@@ -51,6 +51,7 @@ static int8_t readNavDirectionY(float rawValue) {
 
 
 
+
 // =============================================================================
 // menuInit()
 // =============================================================================
@@ -68,6 +69,7 @@ void menuInit() {
     choiceMade = false;
     finalSelection = { -1, -1 };
 }
+
 
 
 
@@ -100,15 +102,14 @@ void menuResetSelection() {
 // =============================================================================
 // Zeichnet das Hauptmenü auf displayPtr
 // =============================================================================
+
 static void drawMainMenu() {
     if (!displayPtr) return;
-    displayPtr->firstPage();
-    do {
-        displayPtr->setFont(u8g2_font_ncenB08_tr);
-        // Menütitel
-        displayPtr->setCursor(0, 12);
-        displayPtr->print("== Hauptmenü ==");
-
+    displayPtr->clearBuffer();
+    displayPtr->setFont(u8g2_font_ncenB08_tr);
+    // Menütitel
+    displayPtr->setCursor(0, 12);
+    displayPtr->print("== Hauptmenü ==");
 
         const char* items[MM_COUNT] = {
             "Homing",
@@ -118,23 +119,24 @@ static void drawMainMenu() {
             "Teach/Play Mode"
         };
 
-        const int maxLines = 5;
-        int start = 0;
-        if (currentMain >= maxLines) {
-            start = currentMain - maxLines + 1;
+    const int maxLines = 5;
+    int start = 0;
+    if (currentMain >= maxLines) {
+        start = currentMain - maxLines + 1;
+    }
+    for (int8_t i = start; i < MM_COUNT && i < start + maxLines; i++) {
+        int y = 16 + (i - start) * 10;
+        if (i == currentMain) {
+            displayPtr->drawStr(0, y, ">");
+            displayPtr->setCursor(8, y);
+        } else {
+            displayPtr->setCursor(8, y);
         }
-        for (int8_t i = start; i < MM_COUNT && i < start + maxLines; i++) {
-            int y = 16 + (i - start) * 10;
-            if (i == currentMain) {
-                displayPtr->drawStr(0, y, ">");
-                displayPtr->setCursor(8, y);
-            } else {
-                displayPtr->setCursor(8, y);
-            }
-            displayPtr->print(items[i]);
-        }
-    } while (displayPtr->nextPage());
+        displayPtr->print(items[i]);
+    }
+    displayPtr->sendBuffer();
 }
+
 
 
 
@@ -143,14 +145,13 @@ static void drawMainMenu() {
 // =============================================================================
 // Zeichnet das Homing-Untermenü
 // =============================================================================
+
 static void drawHomingSubMenu() {
     if (!displayPtr) return;
-    displayPtr->firstPage();
-    do {
-        displayPtr->setFont(u8g2_font_ncenB08_tr);
-        displayPtr->setCursor(0, 12);
-        displayPtr->print("== Homing Menu ==");
-
+    displayPtr->clearBuffer();
+    displayPtr->setFont(u8g2_font_ncenB08_tr);
+    displayPtr->setCursor(0, 12);
+    displayPtr->print("== Homing Menu ==");
 
         const char* items[HS_COUNT] = {
             "1. Einzelachse",
@@ -160,23 +161,24 @@ static void drawHomingSubMenu() {
             "5. Zurueck"
         };
 
-        const int maxLines = 5;
-        int start = 0;
-        if (currentHomingSub >= maxLines) {
-            start = currentHomingSub - maxLines + 1;
+    const int maxLines = 5;
+    int start = 0;
+    if (currentHomingSub >= maxLines) {
+        start = currentHomingSub - maxLines + 1;
+    }
+    for (int8_t i = start; i < HS_COUNT && i < start + maxLines; i++) {
+        int y = 16 + (i - start) * 10;
+        if (i == currentHomingSub) {
+            displayPtr->drawStr(0, y, ">");
+            displayPtr->setCursor(8, y);
+        } else {
+            displayPtr->setCursor(8, y);
         }
-        for (int8_t i = start; i < HS_COUNT && i < start + maxLines; i++) {
-            int y = 16 + (i - start) * 10;
-            if (i == currentHomingSub) {
-                displayPtr->drawStr(0, y, ">");
-                displayPtr->setCursor(8, y);
-            } else {
-                displayPtr->setCursor(8, y);
-            }
-            displayPtr->print(items[i]);
-        }
-    } while (displayPtr->nextPage());
+        displayPtr->print(items[i]);
+    }
+    displayPtr->sendBuffer();
 }
+
 
 
 
@@ -185,14 +187,13 @@ static void drawHomingSubMenu() {
 // =============================================================================
 // Zeichnet das Kinematic-Untermenü
 // =============================================================================
+
 static void drawKinematicSubMenu() {
     if (!displayPtr) return;
-    displayPtr->firstPage();
-    do {
-        displayPtr->setFont(u8g2_font_ncenB08_tr);
-        displayPtr->setCursor(0, 12);
-        displayPtr->print("== Kinematic Menu ==");
-
+    displayPtr->clearBuffer();
+    displayPtr->setFont(u8g2_font_ncenB08_tr);
+    displayPtr->setCursor(0, 12);
+    displayPtr->print("== Kinematic Menu ==");
 
         const char* items[KS_COUNT] = {
             "1. Sensoren Ein/Aus",
@@ -201,23 +202,24 @@ static void drawKinematicSubMenu() {
             "4. Zurueck"
         };
 
-        const int maxLines = 5;
-        int start = 0;
-        if (currentKinematicSub >= maxLines) {
-            start = currentKinematicSub - maxLines + 1;
+    const int maxLines = 5;
+    int start = 0;
+    if (currentKinematicSub >= maxLines) {
+        start = currentKinematicSub - maxLines + 1;
+    }
+    for (int8_t i = start; i < KS_COUNT && i < start + maxLines; i++) {
+        int y = 16 + (i - start) * 10;
+        if (i == currentKinematicSub) {
+            displayPtr->drawStr(0, y, ">");
+            displayPtr->setCursor(8, y);
+        } else {
+            displayPtr->setCursor(8, y);
         }
-        for (int8_t i = start; i < KS_COUNT && i < start + maxLines; i++) {
-            int y = 16 + (i - start) * 10;
-            if (i == currentKinematicSub) {
-                displayPtr->drawStr(0, y, ">");
-                displayPtr->setCursor(8, y);
-            } else {
-                displayPtr->setCursor(8, y);
-            }
-            displayPtr->print(items[i]);
-        }
-    } while (displayPtr->nextPage());
+        displayPtr->print(items[i]);
+    }
+    displayPtr->sendBuffer();
 }
+
 
 
 

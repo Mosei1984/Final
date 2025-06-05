@@ -18,6 +18,7 @@ static inline float deg2rad(float deg) {
 bool isEndstopPressed(uint8_t axis) {
     return (digitalRead(ENDSTOP_PINS[axis]) == HIGH);
 }
+in
 
 
 // ----------------------------------------------------------------------------
@@ -52,6 +53,7 @@ bool homeAxis(uint8_t axis) {
     // Motor aktivieren (Enable LOW)
     digitalWrite(ENABLE_PINS[axis], LOW);
 
+
     unsigned long startTime = millis();
     while (!isEndstopPressed(axis)) {
         motors[axis].runSpeed();
@@ -61,6 +63,7 @@ bool homeAxis(uint8_t axis) {
             return false;
         }
     }
+
 
     // 2) Endstop erkannt: anhalten, kurze Pause, dann Backoff
     motors[axis].stop();
@@ -134,6 +137,7 @@ bool homeAxis(uint8_t axis) {
 
 
 
+
 // ----------------------------------------------------------------------------
 // Homing aller Achsen (0..3) und anschließende Kalibrierpose
 // ----------------------------------------------------------------------------
@@ -148,21 +152,24 @@ bool homeAllAxes() {
 
 
 
+
     // Homing Reihenfolge
+
     if (!homeAxis(0)) return false;
     if (!homeAxis(1)) return false;
     if (!homeAxis(2)) return false;
     if (!homeAxis(3)) return false;
+
     // Optional: homing für 4, 5, falls benötigt:
     // homeAxis(4);
     // homeAxis(5);
 
     // Anschließend in Kalibrierpose fahren
-
     moveToCalibrationPose();
     DEBUG_PRINTLN("Homing sequence done");
     return true;
 }
+
 
 
 

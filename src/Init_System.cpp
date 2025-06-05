@@ -61,6 +61,7 @@ void InitSystem::initializeSensorsAndFilters() {
     delay(50);
 
     // --- 3) ADXL‐Offset‐Kalibrierung ---
+
     InitSystem::calibrateAccelerometer();
     DEBUG_PRINT("ADXL Offsets: X="); DEBUG_PRINT(accelOffsetX);
     DEBUG_PRINT("  Y="); DEBUG_PRINT(accelOffsetY);
@@ -147,6 +148,16 @@ float InitSystem::getCorrectedLaserHeight(float tiltRad) {
     if (d < 0.0f) d = 0.0f;
     float h = d * cosf(tiltRad);
     return h;
+}
+
+// =====================
+// InitSystem::isLaserReady()
+// =====================
+
+bool InitSystem::isLaserReady() {
+    VL53L0X_RangingMeasurementData_t measure;
+    lox.rangingTest(&measure, false);
+    return measure.RangeStatus != 4; // 4 indicates out of range
 }
 
 // =====================

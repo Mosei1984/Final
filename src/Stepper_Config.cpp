@@ -82,6 +82,7 @@ void stopAllSteppers() {
     }
 }
 
+
 void stepperISR() {
     // ===== Einzelachsen (JointMode) – STEP-Pulse =====
 

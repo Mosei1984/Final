@@ -1,5 +1,6 @@
 // KinematicMode.cpp
 
+
 #include "Kinematic_Mode.h"
 #include "Robo_Config_V1.h" // displayPtr
 #include "Debug.h"
@@ -122,6 +123,7 @@ void kinematicModeUpdate() {
         targetPos[0] += rs->leftX * stepIncrement;
         targetPos[1] += rs->leftY * stepIncrement;
         targetPos[2] += rs->rightZ * stepIncrement;
+
 
 
 
