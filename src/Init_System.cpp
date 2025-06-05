@@ -171,6 +171,16 @@ bool InitSystem::isLaserReady() {
 }
 
 // =====================
+// InitSystem::isLaserReady()
+// =====================
+
+bool InitSystem::isLaserReady() {
+    VL53L0X_RangingMeasurementData_t measure;
+    lox.rangingTest(&measure, false);
+    return measure.RangeStatus != 4; // 4 indicates out of range
+}
+
+// =====================
 // InitSystem::kalmanUpdate()
 // =====================
 

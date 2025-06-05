@@ -130,6 +130,7 @@ void kinematicModeUpdate() {
 
 
 
+
         // Begrenze Zielkoordinaten z.B. [–0.5m..+0.5m]
         for (int i = 0; i < 3; i++) {
             if (targetPos[i] < -0.5) targetPos[i] = -0.5;

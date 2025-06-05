@@ -55,6 +55,7 @@ static bool returnToMenu = false;
 static SystemStatus currentStatus = STATUS_IDLE;
 
 
+
 // -----------------------------------------------------------------------------
 // LED-Status-Funktion
 // -----------------------------------------------------------------------------
@@ -98,6 +99,18 @@ void setStatusLED(SystemStatus s) {
     pixels.setPixelColor(i, color);
   }
   pixels.show();
+}
+
+// Kleine Hilfsfunktion, um eine zweizeilige Meldung auf dem Display anzuzeigen
+static void showMessage(const char* line1, const char* line2) {
+  if (!displayPtr) return;
+  displayPtr->clearBuffer();
+  displayPtr->setFont(u8g2_font_ncenB08_tr);
+  displayPtr->setCursor(0, 20);
+  displayPtr->print(line1);
+  displayPtr->setCursor(0, 40);
+  displayPtr->print(line2);
+  displayPtr->sendBuffer();
 }
 
 // Kleine Hilfsfunktion, um eine zweizeilige Meldung auf dem Display anzuzeigen
@@ -254,6 +267,7 @@ static void handleHomingSub(int8_t subIndex) {
   currentStatus = STATUS_IDLE;
   setStatusLED(currentStatus);
 }
+
 
 
 

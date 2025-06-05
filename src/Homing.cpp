@@ -1,5 +1,3 @@
-// Homing.cpp
-
 
 #include "Homing.h"  // Enthält MICROSTEPPING usw.
 #include "Debug.h"
@@ -13,12 +11,12 @@ static inline float deg2rad(float deg) {
 
 // ----------------------------------------------------------------------------
 // Prüft, ob Endstop (INPUT_PULLUP) der Achse gedrückt ist (HIGH = gedrückt)
+
 // Die Schalter sind "NC" zu GND und oeffnen beim Druecken.
 // ----------------------------------------------------------------------------
 bool isEndstopPressed(uint8_t axis) {
     return (digitalRead(ENDSTOP_PINS[axis]) == HIGH);
 }
-in
 
 
 // ----------------------------------------------------------------------------
@@ -63,6 +61,7 @@ bool homeAxis(uint8_t axis) {
             return false;
         }
     }
+
 
 
     // 2) Endstop erkannt: anhalten, kurze Pause, dann Backoff
@@ -138,6 +137,7 @@ bool homeAxis(uint8_t axis) {
 
 
 
+
 // ----------------------------------------------------------------------------
 // Homing aller Achsen (0..3) und anschließende Kalibrierpose
 // ----------------------------------------------------------------------------
@@ -148,6 +148,7 @@ bool homeAllAxes() {
     for (uint8_t i = 0; i < 6; i++) {
         pinMode(ENDSTOP_PINS[i], INPUT_PULLUP);
     }
+
 
 
 
@@ -165,13 +166,11 @@ bool homeAllAxes() {
     // homeAxis(5);
 
     // Anschließend in Kalibrierpose fahren
+
     moveToCalibrationPose();
     DEBUG_PRINTLN("Homing sequence done");
     return true;
 }
-
-
-
 
 
 // ----------------------------------------------------------------------------

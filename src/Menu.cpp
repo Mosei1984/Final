@@ -20,7 +20,6 @@ static bool inKinematicSub   = false;
 static int8_t currentKinematicSub = 0;
 
 // Joystick-Vorzustände für Auf-/Ab-Bewegung (–1,0,+1)
-
 static int8_t prevMainNavY = 0;
 static int8_t prevSubNavY  = 0;
 static bool   prevButton1  = false;
@@ -45,13 +44,6 @@ static int8_t readNavDirectionY(float rawValue) {
     return 0;
 }
 
-
-
-
-
-
-
-
 // =============================================================================
 // menuInit()
 // =============================================================================
@@ -69,13 +61,6 @@ void menuInit() {
     choiceMade = false;
     finalSelection = { -1, -1 };
 }
-
-
-
-
-
-
-
 
 // =============================================================================
 // menuSelectionAvailable()
@@ -136,6 +121,7 @@ static void drawMainMenu() {
     }
     displayPtr->sendBuffer();
 }
+
 
 
 
@@ -219,6 +205,7 @@ static void drawKinematicSubMenu() {
     }
     displayPtr->sendBuffer();
 }
+
 
 
 
@@ -365,7 +352,6 @@ void menuUpdate() {
             prevSubNavY = 0;
             DEBUG_PRINTLN("Kinematic menu exit");
         }
-
 
         drawKinematicSubMenu();
         return;
