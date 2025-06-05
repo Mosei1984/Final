@@ -14,6 +14,8 @@ static bool inGoToPosition = false;
 
 // Navigationsvorher (damit nur Flankenbewegungen zählen)
 static int8_t prevNavY = 0;
+static bool   prevButton1 = false;
+static bool   prevButton2 = false;
 
 // Aktuelle Zielkoordinaten in Metern (X, Y, Z)
 static double targetPos[3] = {0.0, 0.0, 0.0};
@@ -33,6 +35,8 @@ static const double STEPS_PER_RAD = ((double)BASE_STEPS) / (2.0 * M_PI);
 void kinematicModeInit() {
     currentSub       = 0;
     prevNavY         = 0;
+    prevButton1      = false;
+    prevButton2      = false;
     inSetPosition    = false;
     inGoToPosition   = false;
     sensorsEnabled   = false;
@@ -82,6 +86,10 @@ void kinematicModeUpdate() {
     // 1) Eingänge aktualisieren
     updateRemoteInputs();
     const RemoteState* rs = getRemoteStatePointer();
+    bool pressed1 = rs->button1 && !prevButton1;
+    bool pressed2 = rs->button2 && !prevButton2;
+    prevButton1 = rs->button1;
+    prevButton2 = rs->button2;
 
     // 2) Wenn man gerade Ziel eingibt (Set Position)
     if (inSetPosition) {
@@ -101,12 +109,12 @@ void kinematicModeUpdate() {
         }
 
         // Bestätigen mit Button1: wechsle zu Go-To-Position
-        if (rs->button1) {
+        if (pressed1) {
             inSetPosition  = false;
             inGoToPosition = true;
         }
         // Abbrechen mit Button2: zurück ins Untermenü
-        if (rs->button2) {
+        if (pressed2) {
             inSetPosition = false;
         }
         return;
@@ -143,9 +151,9 @@ void kinematicModeUpdate() {
     // Rechter Joystick Y steuert Untermenü-Auswahl
     int8_t navY = 0;
     if (rs->rightY > 0.5f) {
-        navY = -1;
+        navY = +1;  // nach unten
     } else if (rs->rightY < -0.5f) {
-        navY = +1;
+        navY = -1;  // nach oben
     }
     if (navY != prevNavY) {
         if (navY == -1) {
@@ -157,7 +165,7 @@ void kinematicModeUpdate() {
     prevNavY = navY;
 
     // Auswahl mit Button1
-    if (rs->button1) {
+    if (pressed1) {
         switch (currentSub) {
             case KS_SENSORS_TOGGLE:
                 sensorsEnabled = !sensorsEnabled;
