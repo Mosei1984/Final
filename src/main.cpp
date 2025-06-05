@@ -161,8 +161,7 @@ void setup() {
 // loop()
 // -----------------------------------------------------------------------------
 void loop() {
-  // 1) Remote-Eingänge & Menü-Update
-  updateRemoteInputs();
+  // 1) Menü-Update (updateRemoteInputs wird in menuUpdate aufgerufen)
   menuUpdate();
 
   // 2) Wenn eine Menü-Auswahl vorliegt, handle sie
@@ -183,7 +182,6 @@ void loop() {
       jointModeInit();
       returnToMenu = false;
       while (!returnToMenu) {
-        updateRemoteInputs();
         jointModeUpdate();
         updateAllSteppers();
         if (getRemoteStatePointer()->button2) {
@@ -203,7 +201,6 @@ void loop() {
       kinematicModeInit();
       returnToMenu = false;
       while (!returnToMenu) {
-        updateRemoteInputs();
         kinematicModeUpdate();
         updateAllSteppers();
         if (getRemoteStatePointer()->button2) {

@@ -13,9 +13,11 @@ static bool inSetPosition = false;
 static bool inGoToPosition = false;
 
 // Navigationsvorher (damit nur Flankenbewegungen zählen)
+
 static int8_t prevNavY = 0;
 static bool   prevButton1 = false;
 static bool   prevButton2 = false;
+
 
 // Aktuelle Zielkoordinaten in Metern (X, Y, Z)
 static double targetPos[3] = {0.0, 0.0, 0.0};
@@ -33,11 +35,13 @@ static const double STEPS_PER_RAD = ((double)BASE_STEPS) / (2.0 * M_PI);
 // kinematicModeInit()
 // =============================================================================
 void kinematicModeInit() {
+
     currentSub       = 0;
     prevNavY         = 0;
     prevButton1      = false;
     prevButton2      = false;
     inSetPosition    = false;
+
     inGoToPosition   = false;
     sensorsEnabled   = false;
 
@@ -82,6 +86,7 @@ bool areSensorsEnabled() {
 // =============================================================================
 // kinematicModeUpdate()
 // =============================================================================
+
 void kinematicModeUpdate() {
     // 1) Eingänge aktualisieren
     updateRemoteInputs();
@@ -105,25 +110,38 @@ void kinematicModeUpdate() {
         targetPos[1] += rs->leftY * stepIncrement;
         targetPos[2] += rs->rightZ * stepIncrement;
 
+
         // Begrenze Zielkoordinaten z.B. [–0.5m..+0.5m]
         for (int i = 0; i < 3; i++) {
             if (targetPos[i] < -0.5) targetPos[i] = -0.5;
             if (targetPos[i] > +0.5) targetPos[i] = +0.5;
         }
 
+
+        // Gebe neue Position nur aus, wenn sie sich spürbar geändert hat
+        if (fabs(prevPos[0] - targetPos[0]) > 0.005 ||
+            fabs(prevPos[1] - targetPos[1]) > 0.005 ||
+            fabs(prevPos[2] - targetPos[2]) > 0.005) {
+            Serial.print("Target X:"); Serial.print(targetPos[0]);
+            Serial.print(" Y:"); Serial.print(targetPos[1]);
+            Serial.print(" Z:"); Serial.println(targetPos[2]);
+            prevPos[0] = targetPos[0];
+            prevPos[1] = targetPos[1];
+            prevPos[2] = targetPos[2];
+        }
+
         // Bestätigen mit Button1: wechsle zu Go-To-Position
         if (pressed1) {
             inSetPosition  = false;
             inGoToPosition = true;
-
+            Serial.println("Set complete -> GoTo");
         }
         // Abbrechen mit Button2: zurück ins Untermenü
         if (pressed2) {
             inSetPosition = false;
-
             Serial.println("Set cancelled");
-
         }
+
         return;
     }
 
@@ -139,6 +157,7 @@ void kinematicModeUpdate() {
         }
         double solAngles[6];
         IKSettings settings;
+
         bool ok = computeInverseKinematics(targetPos, zeroOri,
                                            initialGuess, solAngles, settings);
         if (ok) {
@@ -183,8 +202,19 @@ void kinematicModeUpdate() {
         }
         Serial.print("Kinematic menu sub: ");
         Serial.println(currentSub);
+
+    }
+    if (navY != prevNavY) {
+        if (navY == -1) {
+            currentSub = (currentSub - 1 + KS_COUNT) % KS_COUNT;
+        } else if (navY == +1) {
+            currentSub = (currentSub + 1) % KS_COUNT;
+        }
+        Serial.print("Kinematic menu sub: ");
+        Serial.println(currentSub);
     }
     prevNavY = navY;
+
 
     // Auswahl mit Button1
     if (pressed1) {
@@ -214,6 +244,7 @@ void kinematicModeUpdate() {
             case KS_GOTO_POSITION:
                 inGoToPosition = true;
                 break;
+
 
             case KS_KIN_BACK:
                 // Beende Kinematic Mode

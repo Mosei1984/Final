@@ -99,7 +99,7 @@ static void drawMainMenu() {
         };
 
         for (int8_t i = 0; i < MM_COUNT; i++) {
-            int y = 24 + i * 12;
+            int y = 16 + i * 10;
             if (i == currentMain) {
                 displayPtr->drawStr(0, y, ">");
                 displayPtr->setCursor(8, y);
@@ -131,7 +131,7 @@ static void drawHomingSubMenu() {
         };
 
         for (int8_t i = 0; i < HS_COUNT; i++) {
-            int y = 24 + i * 12;
+            int y = 16 + i * 10;
             if (i == currentHomingSub) {
                 displayPtr->drawStr(0, y, ">");
                 displayPtr->setCursor(8, y);
@@ -162,7 +162,7 @@ static void drawKinematicSubMenu() {
         };
 
         for (int8_t i = 0; i < KS_COUNT; i++) {
-            int y = 24 + i * 12;
+            int y = 16 + i * 10;
             if (i == currentKinematicSub) {
                 displayPtr->drawStr(0, y, ">");
                 displayPtr->setCursor(8, y);

@@ -10,10 +10,11 @@ static inline float deg2rad(float deg) {
 }
 
 // ----------------------------------------------------------------------------
-// Prüft, ob Endstop (INPUT_PULLUP) der Achse gedrückt ist (LOW = gedrückt)
+// Prüft, ob Endstop (INPUT_PULLUP) der Achse gedrückt ist (HIGH = gedrückt)
+// Die Schalter sind "NC" zu GND und oeffnen beim Druecken.
 // ----------------------------------------------------------------------------
 bool isEndstopPressed(uint8_t axis) {
-    return (digitalRead(ENDSTOP_PINS[axis]) == LOW);
+    return (digitalRead(ENDSTOP_PINS[axis]) == HIGH);
 }
 
 // ----------------------------------------------------------------------------
