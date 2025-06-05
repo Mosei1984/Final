@@ -7,16 +7,11 @@
 #include "Robo_Config_V1.h"  // Enthält joyLXCenter, joyLYCenter, joyRZCenter, joyRYawCenter, DEADZONE, SERVO_POT_PIN
 
 // =====================
-// Externe Pin-Definitionen (vom Benutzer in Robo_Config_V1.cpp setzen)
+// Pin-Definitionen
 // =====================
-
-extern const uint8_t JOY_LX_PIN;   // Analog-Pin für linken Joystick X-Achse
-extern const uint8_t JOY_LY_PIN;   // Analog-Pin für linken Joystick Y-Achse
-extern const uint8_t JOY_RZ_PIN;   // Analog-Pin für rechten Joystick Z-Achse
-extern const uint8_t JOY_RY_PIN;   // Analog-Pin für rechten Joystick Yaw-Achse
-
-extern const uint8_t BUTTON1_PIN;  // Digital-Pin für Button 1
-extern const uint8_t BUTTON2_PIN;  // Digital-Pin für Button 2
+// Die konkreten Pin-Werte werden in `Robo_Config_V1.h` als `constexpr`
+// Konstanten definiert. Daher benoetigt dieses Modul hier keine eigenen
+// Deklarationen mehr.
 
 // =====================
 // Strukturen & Datentypen
