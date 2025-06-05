@@ -34,11 +34,13 @@ static const double STEPS_PER_RAD = ((double)BASE_STEPS) / (2.0 * M_PI);
 // kinematicModeInit()
 // =============================================================================
 void kinematicModeInit() {
+
     currentSub       = 0;
     prevNavY         = 0;
     prevButton1      = false;
     prevButton2      = false;
     inSetPosition    = false;
+
     inGoToPosition   = false;
     sensorsEnabled   = false;
 
@@ -83,6 +85,8 @@ bool areSensorsEnabled() {
 // =============================================================================
 // kinematicModeUpdate()
 // =============================================================================
+
+
 void kinematicModeUpdate() {
     // 1) Eingänge aktualisieren
     updateRemoteInputs();
@@ -94,8 +98,10 @@ void kinematicModeUpdate() {
 
     // 2) Wenn man gerade Ziel eingibt (Set Position)
     if (inSetPosition) {
-        static double prevPos[3] = {0.0, 0.0, 0.0};
-        // Anpassung:
+        Serial.print("Target X:"); Serial.print(targetPos[0]);
+        Serial.print(" Y:"); Serial.print(targetPos[1]);
+        Serial.print(" Z:"); Serial.println(targetPos[2]);
+        // Anpassung: 
         //   - Linker Joystick X  steuert ΔX (–0.01 … +0.01 m)
         //   - Linker Joystick Y  steuert ΔY (–0.01 … +0.01 m)
         //   - Rechter Joystick X steuert ΔZ (–0.01 … +0.01 m)
@@ -104,11 +110,14 @@ void kinematicModeUpdate() {
         targetPos[1] += rs->leftY * stepIncrement;
         targetPos[2] += rs->rightZ * stepIncrement;
 
+
+
         // Begrenze Zielkoordinaten z.B. [–0.5m..+0.5m]
         for (int i = 0; i < 3; i++) {
             if (targetPos[i] < -0.5) targetPos[i] = -0.5;
             if (targetPos[i] > +0.5) targetPos[i] = +0.5;
         }
+
 
         // Gebe neue Position nur aus, wenn sie sich spürbar geändert hat
         if (fabs(prevPos[0] - targetPos[0]) > 0.005 ||
@@ -147,6 +156,7 @@ void kinematicModeUpdate() {
             inSetPosition = false;
             Serial.println("Set cancelled");
         }
+
         return;
     }
 
@@ -162,6 +172,8 @@ void kinematicModeUpdate() {
         }
         double solAngles[6];
         IKSettings settings;
+
+
         bool ok = computeInverseKinematics(targetPos, zeroOri,
                                            initialGuess, solAngles, settings);
         if (ok) {
@@ -188,6 +200,35 @@ void kinematicModeUpdate() {
         navY = +1;  // nach unten
     } else if (rs->rightY < -0.5f) {
         navY = -1;  // nach oben
+
+    }
+    if (navY != prevNavY) {
+        if (navY == -1) {
+            currentSub = (currentSub - 1 + KS_COUNT) % KS_COUNT;
+        } else if (navY == +1) {
+            currentSub = (currentSub + 1) % KS_COUNT;
+        }
+
+    }
+    if (navY != prevNavY) {
+        if (navY == -1) {
+            currentSub = (currentSub - 1 + KS_COUNT) % KS_COUNT;
+        } else if (navY == +1) {
+            currentSub = (currentSub + 1) % KS_COUNT;
+        }
+        Serial.print("Kinematic menu sub: ");
+        Serial.println(currentSub);
+
+    }
+    if (navY != prevNavY) {
+        if (navY == -1) {
+            currentSub = (currentSub - 1 + KS_COUNT) % KS_COUNT;
+        } else if (navY == +1) {
+            currentSub = (currentSub + 1) % KS_COUNT;
+        }
+        Serial.print("Kinematic menu sub: ");
+        Serial.println(currentSub);
+
     }
     if (navY != prevNavY) {
         if (navY == -1) {
@@ -200,21 +241,16 @@ void kinematicModeUpdate() {
     }
     prevNavY = navY;
 
+
+
     // Auswahl mit Button1
     if (pressed1) {
+
         switch (currentSub) {
             case KS_SENSORS_TOGGLE:
                 sensorsEnabled = !sensorsEnabled;
                 Serial.print("Sensors ");
                 Serial.println(sensorsEnabled ? "on" : "off");
-                if (displayPtr) {
-                    displayPtr->clearBuffer();
-                    displayPtr->setFont(u8g2_font_ncenB08_tr);
-                    displayPtr->setCursor(0, 20);
-                    displayPtr->print("Sensors:");
-                    displayPtr->print(sensorsEnabled ? "ON" : "OFF");
-                    displayPtr->sendBuffer();
-                }
                 break;
             case KS_SET_POSITION:
                 inSetPosition = true;
@@ -224,6 +260,20 @@ void kinematicModeUpdate() {
                 inGoToPosition = true;
                 Serial.println("Execute IK move");
                 break;
+
+        switch (currentSub) {
+            case KS_SENSORS_TOGGLE:
+                sensorsEnabled = !sensorsEnabled;
+                break;
+            case KS_SET_POSITION:
+                inSetPosition = true;
+                break;
+            case KS_GOTO_POSITION:
+                inGoToPosition = true;
+                break;
+
+
+
             case KS_KIN_BACK:
                 // Beende Kinematic Mode
                 kinematicModeStop();
