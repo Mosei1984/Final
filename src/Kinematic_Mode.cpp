@@ -1,6 +1,10 @@
 // KinematicMode.cpp
 
 #include "Kinematic_Mode.h"
+#include "Robo_Config_V1.h" // displayPtr
+#include "Debug.h"
+#include "Sensors.h"
+#include "SystemStatus.h"
 
 // =============================================================================
 // Interne State-Variablen
@@ -14,6 +18,8 @@ static bool inGoToPosition = false;
 
 // Navigationsvorher (damit nur Flankenbewegungen zählen)
 static int8_t prevNavY = 0;
+static bool   prevButton1 = false;
+static bool   prevButton2 = false;
 
 // Aktuelle Zielkoordinaten in Metern (X, Y, Z)
 static double targetPos[3] = {0.0, 0.0, 0.0};
@@ -33,6 +39,8 @@ static const double STEPS_PER_RAD = ((double)BASE_STEPS) / (2.0 * M_PI);
 void kinematicModeInit() {
     currentSub       = 0;
     prevNavY         = 0;
+    prevButton1      = false;
+    prevButton2      = false;
     inSetPosition    = false;
     inGoToPosition   = false;
     sensorsEnabled   = false;
@@ -82,10 +90,21 @@ void kinematicModeUpdate() {
     // 1) Eingänge aktualisieren
     updateRemoteInputs();
     const RemoteState* rs = getRemoteStatePointer();
+    if (sensorsEnabled) {
+        double zF, pitchF;
+        sensorsEkfUpdate(zF, pitchF);
+        DEBUG_PRINT("Zf:"); DEBUG_PRINT(zF);
+        DEBUG_PRINT(" pitch:"); DEBUG_PRINTLN(pitchF);
+    }
+    bool pressed1 = rs->button1 && !prevButton1;
+    bool pressed2 = rs->button2 && !prevButton2;
+    prevButton1 = rs->button1;
+    prevButton2 = rs->button2;
 
     // 2) Wenn man gerade Ziel eingibt (Set Position)
     if (inSetPosition) {
-        // Anpassung: 
+        static double prevPos[3] = {0.0, 0.0, 0.0};
+        // Anpassung:
         //   - Linker Joystick X  steuert ΔX (–0.01 … +0.01 m)
         //   - Linker Joystick Y  steuert ΔY (–0.01 … +0.01 m)
         //   - Rechter Joystick X steuert ΔZ (–0.01 … +0.01 m)
@@ -100,14 +119,42 @@ void kinematicModeUpdate() {
             if (targetPos[i] > +0.5) targetPos[i] = +0.5;
         }
 
+        // Gebe neue Position nur aus, wenn sie sich spürbar geändert hat
+        if (fabs(prevPos[0] - targetPos[0]) > 0.005 ||
+            fabs(prevPos[1] - targetPos[1]) > 0.005 ||
+            fabs(prevPos[2] - targetPos[2]) > 0.005) {
+            DEBUG_PRINT("Target X:"); DEBUG_PRINT(targetPos[0]);
+            DEBUG_PRINT(" Y:"); DEBUG_PRINT(targetPos[1]);
+            DEBUG_PRINT(" Z:"); DEBUG_PRINTLN(targetPos[2]);
+            if (displayPtr) {
+                displayPtr->clearBuffer();
+                displayPtr->setFont(u8g2_font_ncenB08_tr);
+                displayPtr->setCursor(0, 16);
+                displayPtr->print("X:");
+                displayPtr->print(targetPos[0], 2);
+                displayPtr->setCursor(0, 32);
+                displayPtr->print("Y:");
+                displayPtr->print(targetPos[1], 2);
+                displayPtr->setCursor(0, 48);
+                displayPtr->print("Z:");
+                displayPtr->print(targetPos[2], 2);
+                displayPtr->sendBuffer();
+            }
+            prevPos[0] = targetPos[0];
+            prevPos[1] = targetPos[1];
+            prevPos[2] = targetPos[2];
+        }
+
         // Bestätigen mit Button1: wechsle zu Go-To-Position
-        if (rs->button1) {
+        if (pressed1) {
             inSetPosition  = false;
             inGoToPosition = true;
+            DEBUG_PRINTLN("Set complete -> GoTo");
         }
         // Abbrechen mit Button2: zurück ins Untermenü
-        if (rs->button2) {
+        if (pressed2) {
             inSetPosition = false;
+            DEBUG_PRINTLN("Set cancelled");
         }
         return;
     }
@@ -127,15 +174,19 @@ void kinematicModeUpdate() {
         bool ok = computeInverseKinematics(targetPos, zeroOri,
                                            initialGuess, solAngles, settings);
         if (ok) {
+            DEBUG_PRINTLN("IK solution found");
             // Wandle Gelenkwinkel in Schritte: θ [rad] → steps
             long stepTargets[6];
             for (uint8_t i = 0; i < 6; i++) {
                 stepTargets[i] = (long)round(solAngles[i] * STEPS_PER_RAD);
             }
             moveToPositionsAsync(stepTargets);
+        } else {
+            DEBUG_PRINTLN("IK failed");
         }
         // Zurück ins Untermenü
         inGoToPosition = false;
+        DEBUG_PRINTLN("Move command sent");
         return;
     }
 
@@ -143,9 +194,9 @@ void kinematicModeUpdate() {
     // Rechter Joystick Y steuert Untermenü-Auswahl
     int8_t navY = 0;
     if (rs->rightY > 0.5f) {
-        navY = -1;
+        navY = +1;  // nach unten
     } else if (rs->rightY < -0.5f) {
-        navY = +1;
+        navY = -1;  // nach oben
     }
     if (navY != prevNavY) {
         if (navY == -1) {
@@ -153,20 +204,35 @@ void kinematicModeUpdate() {
         } else if (navY == +1) {
             currentSub = (currentSub + 1) % KS_COUNT;
         }
+        DEBUG_PRINT("Kinematic menu sub: ");
+        DEBUG_PRINTLN(currentSub);
     }
     prevNavY = navY;
 
     // Auswahl mit Button1
-    if (rs->button1) {
+    if (pressed1) {
         switch (currentSub) {
             case KS_SENSORS_TOGGLE:
                 sensorsEnabled = !sensorsEnabled;
+                DEBUG_PRINT("Sensors ");
+                DEBUG_PRINTLN(sensorsEnabled ? "on" : "off");
+                setStatusLED(STATUS_KINEMATIC);
+                if (displayPtr) {
+                    displayPtr->clearBuffer();
+                    displayPtr->setFont(u8g2_font_ncenB08_tr);
+                    displayPtr->setCursor(0, 20);
+                    displayPtr->print("Sensors:");
+                    displayPtr->print(sensorsEnabled ? "ON" : "OFF");
+                    displayPtr->sendBuffer();
+                }
                 break;
             case KS_SET_POSITION:
                 inSetPosition = true;
+                DEBUG_PRINTLN("Set target position");
                 break;
             case KS_GOTO_POSITION:
                 inGoToPosition = true;
+                DEBUG_PRINTLN("Execute IK move");
                 break;
             case KS_KIN_BACK:
                 // Beende Kinematic Mode

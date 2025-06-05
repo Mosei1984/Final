@@ -12,6 +12,7 @@
 #include "Kinematic_Mode.h"
 #include "Homing.h"
 #include "Stepper_Config.h"
+#include "SystemStatus.h"
 
 // -----------------------------------------------------------------------------
 // Globale Objekte
@@ -20,8 +21,23 @@
 // OLED-Display (SSD1306 I²C, Full-Buffer)
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C* oled;
 
-// Timer für die STEP-ISR (1 kHz)
+// Timer für die STEP-ISR (2 kHz)
 IntervalTimer stepTimer;
+static bool stepTimerRunning = false;
+
+static void startStepTimer() {
+  if (!stepTimerRunning) {
+    stepTimer.begin(stepperISR, 500);  // 2 kHz
+    stepTimerRunning = true;
+  }
+}
+
+static void stopStepTimer() {
+  if (stepTimerRunning) {
+    stepTimer.end();
+    stepTimerRunning = false;
+  }
+}
 
 // NeoPixel-Status-LEDs
 Adafruit_NeoPixel pixels(NUM_PIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
@@ -30,14 +46,6 @@ Adafruit_NeoPixel pixels(NUM_PIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 static bool returnToMenu = false;
 
 // Aktueller System-Status (für LEDs)
-enum SystemStatus {
-  STATUS_MENU,
-  STATUS_HOMING,
-  STATUS_JOINT,
-  STATUS_KINEMATIC,
-  STATUS_IDLE,
-  STATUS_ERROR
-};
 static SystemStatus currentStatus = STATUS_IDLE;
 
 // -----------------------------------------------------------------------------
@@ -45,7 +53,7 @@ static SystemStatus currentStatus = STATUS_IDLE;
 // -----------------------------------------------------------------------------
 // Setzt alle NeoPixels auf eine Farbe passend zum SystemStatus.
 // -----------------------------------------------------------------------------
-static void setStatusLED(SystemStatus s) {
+void setStatusLED(SystemStatus s) {
   uint32_t color;
   switch (s) {
     case STATUS_MENU:
@@ -58,7 +66,11 @@ static void setStatusLED(SystemStatus s) {
       color = pixels.Color(0, 200, 0);   // Grün
       break;
     case STATUS_KINEMATIC:
-      color = pixels.Color(0, 150, 150); // Cyan
+      if (areSensorsEnabled()) {
+        color = pixels.Color(150, 0, 150); // Magenta wenn Sensoren aktiv
+      } else {
+        color = pixels.Color(0, 150, 150); // Cyan
+      }
       break;
     case STATUS_IDLE:
       color = pixels.Color(0, 50, 0);    // Dunkelgrün (ruhig)
@@ -77,12 +89,26 @@ static void setStatusLED(SystemStatus s) {
   pixels.show();
 }
 
+// Kleine Hilfsfunktion, um eine zweizeilige Meldung auf dem Display anzuzeigen
+static void showMessage(const char* line1, const char* line2) {
+  if (!displayPtr) return;
+  displayPtr->clearBuffer();
+  displayPtr->setFont(u8g2_font_ncenB08_tr);
+  displayPtr->setCursor(0, 20);
+  displayPtr->print(line1);
+  displayPtr->setCursor(0, 40);
+  displayPtr->print(line2);
+  displayPtr->sendBuffer();
+}
+
 // -----------------------------------------------------------------------------
 // Wrapper für Homing-Untermenüaktionen
 // -----------------------------------------------------------------------------
 static void handleHomingSub(int8_t subIndex) {
   currentStatus = STATUS_HOMING;
   setStatusLED(currentStatus);
+  stopStepTimer();
+  showMessage("Homing...", "");
 
   switch (subIndex) {
     case HS_SINGLE_AXIS:
@@ -118,6 +144,8 @@ static void handleHomingSub(int8_t subIndex) {
       break;
   }
 
+  showMessage("Homing", "done");
+  startStepTimer();
   currentStatus = STATUS_IDLE;
   setStatusLED(currentStatus);
 }
@@ -148,8 +176,9 @@ void setup() {
   configureSteppers();
   setupMultiStepper();
 
-  // --- 5) STEP-Timer (1 kHz) ---
-  stepTimer.begin(stepperISR, 1000);
+  // --- 5) STEP-Timer (2 kHz) ---
+  // Hoehere Frequenz erlaubt schnellere Schrittgeschwindigkeiten
+  startStepTimer();
 
   // --- 6) Menü initialisieren ---
   currentStatus = STATUS_MENU;
@@ -161,8 +190,7 @@ void setup() {
 // loop()
 // -----------------------------------------------------------------------------
 void loop() {
-  // 1) Remote-Eingänge & Menü-Update
-  updateRemoteInputs();
+  // 1) Menü-Update (updateRemoteInputs wird in menuUpdate aufgerufen)
   menuUpdate();
 
   // 2) Wenn eine Menü-Auswahl vorliegt, handle sie
@@ -180,16 +208,17 @@ void loop() {
       currentStatus = STATUS_JOINT;
       setStatusLED(currentStatus);
 
+      showMessage("Joint Mode", "Button2=Back");
       jointModeInit();
       returnToMenu = false;
       while (!returnToMenu) {
-        updateRemoteInputs();
         jointModeUpdate();
         updateAllSteppers();
         if (getRemoteStatePointer()->button2) {
           returnToMenu = true;
         }
       }
+      showMessage("Joint Mode", "done");
       jointModeStop();
 
       currentStatus = STATUS_IDLE;
@@ -200,16 +229,17 @@ void loop() {
       currentStatus = STATUS_KINEMATIC;
       setStatusLED(currentStatus);
 
+      showMessage("Kinematic", "Button2=Back");
       kinematicModeInit();
       returnToMenu = false;
       while (!returnToMenu) {
-        updateRemoteInputs();
         kinematicModeUpdate();
         updateAllSteppers();
         if (getRemoteStatePointer()->button2) {
           returnToMenu = true;
         }
       }
+      showMessage("Kinematic", "done");
       kinematicModeStop();
 
       currentStatus = STATUS_IDLE;
