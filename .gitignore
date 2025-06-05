@@ -1,0 +1,87 @@
+# Project-specific ignores
+_Stepper_Module_V1/
+**/build/
+**/debug/
+**/release/
+
+# Compiled output
+*.o
+*.obj
+*.elf
+*.hex
+*.bin
+*.map
+*.lst
+*.sym
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.a
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Arduino specific
+.pioenvs
+.piolibdeps
+.clang_complete
+.gcc-flags.json
+
+# Dependency directories
+/vendor/
+/node_modules/
+/libs/
+/lib/private/
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+.settings/
+.project
+.cproject
+*.launch
+
+# Secrets and credentials
+*.key
+*.pem
+*.env
+credentials.h
+secrets.h
+*password*
+*apikey*
+*secret*
+*token*
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite
+*.db
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+tmp/
+temp/
+
+# System files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Other common ignores
+.cache/
+__pycache__/
+*.py[cod]
+*$py.class
