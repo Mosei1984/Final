@@ -5,6 +5,7 @@
 #include "Robo_Config_V1.h" // displayPtr
 #include "Debug.h"
 #include "Sensors.h"
+#include "SystemStatus.h"
 
 
 // =============================================================================
@@ -18,7 +19,7 @@ static bool inSetPosition = false;
 static bool inGoToPosition = false;
 
 // Navigationsvorher (damit nur Flankenbewegungen zählen)
-r
+
 static int8_t prevNavY = 0;
 static bool   prevButton1 = false;
 static bool   prevButton2 = false;
@@ -118,6 +119,7 @@ void kinematicModeUpdate() {
         targetPos[0] += rs->leftX * stepIncrement;
         targetPos[1] += rs->leftY * stepIncrement;
         targetPos[2] += rs->rightZ * stepIncrement;
+
 
 
 
@@ -230,6 +232,7 @@ void kinematicModeUpdate() {
                 sensorsEnabled = !sensorsEnabled;
                 DEBUG_PRINT("Sensors ");
                 DEBUG_PRINTLN(sensorsEnabled ? "on" : "off");
+                setStatusLED(STATUS_KINEMATIC);
                 if (displayPtr) {
                     displayPtr->clearBuffer();
                     displayPtr->setFont(u8g2_font_ncenB08_tr);

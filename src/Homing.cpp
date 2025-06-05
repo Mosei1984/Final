@@ -5,7 +5,6 @@
 #include "Debug.h"
 
 
-
 // Hilfsfunktion: Grad → Radiant
 static inline float deg2rad(float deg) {
     return deg * (M_PI / 180.0f);
@@ -127,6 +126,7 @@ void homeAxis(uint8_t axis) {
 }
 
 
+
 // ----------------------------------------------------------------------------
 // Homing aller Achsen (0..3) und anschließende Kalibrierpose
 // ----------------------------------------------------------------------------
@@ -139,6 +139,7 @@ void homeAllAxes() {
     }
 
 
+
     // Homing Reihenfolge
     homeAxis(0);
     homeAxis(1);
@@ -149,10 +150,10 @@ void homeAllAxes() {
     // homeAxis(5);
 
     // Anschließend in Kalibrierpose fahren
-
     moveToCalibrationPose();
     DEBUG_PRINTLN("Homing sequence done");
 }
+
 
 
 // ----------------------------------------------------------------------------

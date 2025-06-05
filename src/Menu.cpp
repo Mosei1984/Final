@@ -4,6 +4,7 @@
 #include "Menu.h"
 #include "Debug.h"
 
+
 // =============================================================================
 // Interne State-Variablen
 // =============================================================================
@@ -48,6 +49,7 @@ static int8_t readNavDirectionY(float rawValue) {
 
 
 
+
 // =============================================================================
 // menuInit()
 // =============================================================================
@@ -65,6 +67,7 @@ void menuInit() {
     choiceMade = false;
     finalSelection = { -1, -1 };
 }
+
 
 
 
@@ -133,6 +136,7 @@ static void drawMainMenu() {
 
 
 
+
 // =============================================================================
 // Zeichnet das Homing-Untermenü
 // =============================================================================
@@ -173,6 +177,7 @@ static void drawHomingSubMenu() {
 
 
 
+
 // =============================================================================
 // Zeichnet das Kinematic-Untermenü
 // =============================================================================
@@ -183,6 +188,7 @@ static void drawKinematicSubMenu() {
         displayPtr->setFont(u8g2_font_ncenB08_tr);
         displayPtr->setCursor(0, 12);
         displayPtr->print("== Kinematic Menu ==");
+
 
         const char* items[KS_COUNT] = {
             "1. Sensoren Ein/Aus",
@@ -210,6 +216,7 @@ static void drawKinematicSubMenu() {
 }
 
 
+
 // =============================================================================
 // menuUpdate()
 // =============================================================================
@@ -219,7 +226,6 @@ void menuUpdate() {
 
     // 1) Eingänge aktualisieren
     updateRemoteInputs();
-
     const RemoteState* rs = getRemoteStatePointer();
     bool pressed1 = rs->button1 && !prevButton1;
     bool pressed2 = rs->button2 && !prevButton2;

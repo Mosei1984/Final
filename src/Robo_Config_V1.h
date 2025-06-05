@@ -24,7 +24,8 @@ constexpr float DEFAULT_MAX_SPEED    = 1000.0f;
 constexpr float DEFAULT_ACCELERATION = 2000.0f;
 
 // --- PIN-Zuweisungen für Stepper (jeweils DRIVER-Modus) ---
-constexpr uint8_t STEP_PINS[6]   = {  2,  5,  8,  8,  11, 14 };
+// Jeder Achse hat einen eindeutigen STEP-Pin.
+constexpr uint8_t STEP_PINS[6]   = {  2,  5,  8,  18, 11, 14 };
 constexpr uint8_t DIR_PINS[6]    = {  3,  6,  9,  12,  15, 20 };
 constexpr uint8_t ENABLE_PINS[6] = { 4, 7, 10, 13, 16, 21 };
 

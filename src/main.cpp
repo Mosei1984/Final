@@ -12,6 +12,7 @@
 #include "Kinematic_Mode.h"
 #include "Homing.h"
 #include "Stepper_Config.h"
+#include "SystemStatus.h"
 
 // -----------------------------------------------------------------------------
 // Globale Objekte
@@ -20,8 +21,8 @@
 // OLED-Display (SSD1306 I²C, Full-Buffer)
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C* oled;
 
-// Timer für die STEP-ISR (1 kHz)
 
+// Timer für die STEP-ISR (2 kHz)
 IntervalTimer stepTimer;
 static bool stepTimerRunning = false;
 
@@ -47,14 +48,6 @@ Adafruit_NeoPixel pixels(NUM_PIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 static bool returnToMenu = false;
 
 // Aktueller System-Status (für LEDs)
-enum SystemStatus {
-  STATUS_MENU,
-  STATUS_HOMING,
-  STATUS_JOINT,
-  STATUS_KINEMATIC,
-  STATUS_IDLE,
-  STATUS_ERROR
-};
 static SystemStatus currentStatus = STATUS_IDLE;
 
 // -----------------------------------------------------------------------------
@@ -62,7 +55,7 @@ static SystemStatus currentStatus = STATUS_IDLE;
 // -----------------------------------------------------------------------------
 // Setzt alle NeoPixels auf eine Farbe passend zum SystemStatus.
 // -----------------------------------------------------------------------------
-static void setStatusLED(SystemStatus s) {
+void setStatusLED(SystemStatus s) {
   uint32_t color;
   switch (s) {
     case STATUS_MENU:
@@ -98,6 +91,18 @@ static void setStatusLED(SystemStatus s) {
     pixels.setPixelColor(i, color);
   }
   pixels.show();
+}
+
+// Kleine Hilfsfunktion, um eine zweizeilige Meldung auf dem Display anzuzeigen
+static void showMessage(const char* line1, const char* line2) {
+  if (!displayPtr) return;
+  displayPtr->clearBuffer();
+  displayPtr->setFont(u8g2_font_ncenB08_tr);
+  displayPtr->setCursor(0, 20);
+  displayPtr->print(line1);
+  displayPtr->setCursor(0, 40);
+  displayPtr->print(line2);
+  displayPtr->sendBuffer();
 }
 
 // Kleine Hilfsfunktion, um eine zweizeilige Meldung auf dem Display anzuzeigen
@@ -203,6 +208,7 @@ static void handleHomingSub(int8_t subIndex) {
 
 
 
+
 // -----------------------------------------------------------------------------
 // setup()
 // -----------------------------------------------------------------------------
@@ -248,9 +254,6 @@ void loop() {
 
   // 1) Menü-Update (updateRemoteInputs wird in menuUpdate aufgerufen)
   menuUpdate();
-
-
-
 
   // 2) Wenn eine Menü-Auswahl vorliegt, handle sie
   if (menuSelectionAvailable()) {
