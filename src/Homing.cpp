@@ -1,7 +1,8 @@
-// Homing.cpp
+
 
 #include "Homing.h"  // Enthält MICROSTEPPING usw.
 #include "Debug.h"
+
 
 
 // Hilfsfunktion: Grad → Radiant
@@ -11,11 +12,14 @@ static inline float deg2rad(float deg) {
 
 // ----------------------------------------------------------------------------
 // Prüft, ob Endstop (INPUT_PULLUP) der Achse gedrückt ist (HIGH = gedrückt)
+
 // Die Schalter sind "NC" zu GND und oeffnen beim Druecken.
 // ----------------------------------------------------------------------------
 bool isEndstopPressed(uint8_t axis) {
     return (digitalRead(ENDSTOP_PINS[axis]) == HIGH);
 }
+
+
 
 // ----------------------------------------------------------------------------
 // Setzt AccelStepper-Positionszähler auf offsetSteps
@@ -26,6 +30,7 @@ static void setStepperPositionToOffset(uint8_t axis, long offsetSteps) {
 
 // ----------------------------------------------------------------------------
 // Homing einer einzelnen Achse
+
 // 1) Fahrt mit HOMING_FAST_SPEED in Richtung HOMING_DIRECTION[axis], bis Endstop auslöst
 // 2) Backoff um HOMING_BACKOFF_STEPS
 // 3) Interne Position auf HOMEPOS_DEG-Offset setzen und currentJointAngles aktualisieren
@@ -33,6 +38,7 @@ static void setStepperPositionToOffset(uint8_t axis, long offsetSteps) {
 bool homeAxis(uint8_t axis) {
     DEBUG_PRINT("Homing axis ");
     DEBUG_PRINTLN(axis);
+
     // 1) Homingfahrt starten
     float fastSpeed = HOMING_FAST_SPEED;
     if (HOMING_DIRECTION[axis]) {
@@ -47,6 +53,7 @@ bool homeAxis(uint8_t axis) {
     // Motor aktivieren (Enable LOW)
     digitalWrite(ENABLE_PINS[axis], LOW);
 
+
     unsigned long startTime = millis();
     while (!isEndstopPressed(axis)) {
         motors[axis].runSpeed();
@@ -57,12 +64,17 @@ bool homeAxis(uint8_t axis) {
         }
     }
 
+
+
+
     // 2) Endstop erkannt: anhalten, kurze Pause, dann Backoff
     motors[axis].stop();
     delay(10);
 
+
     // Backoff in Gegenrichtung
     long backoff = HOMING_BACKOFF_STEPS;
+
     if (HOMING_DIRECTION[axis]) {
         // Umkehr auf negative logische Richtung
         digitalWrite(DIR_PINS[axis], MOTOR_DIRECTION[axis] ? HIGH : LOW);
@@ -115,6 +127,7 @@ bool homeAxis(uint8_t axis) {
     setStepperPositionToOffset(axis, offsetSteps);
 
     // Motor deaktivieren (Enable HIGH)
+
     digitalWrite(ENABLE_PINS[axis], HIGH);
     delay(10);
     DEBUG_PRINT("Axis ");
@@ -123,9 +136,16 @@ bool homeAxis(uint8_t axis) {
     return true;
 }
 
+
+
+
+
+
+
 // ----------------------------------------------------------------------------
 // Homing aller Achsen (0..3) und anschließende Kalibrierpose
 // ----------------------------------------------------------------------------
+
 bool homeAllAxes() {
     DEBUG_PRINTLN("Starting homing sequence");
     // Endstop-Pins auf INPUT_PULLUP
@@ -133,20 +153,31 @@ bool homeAllAxes() {
         pinMode(ENDSTOP_PINS[i], INPUT_PULLUP);
     }
 
+
+
+
+
+
+
     // Homing Reihenfolge
+
     if (!homeAxis(0)) return false;
     if (!homeAxis(1)) return false;
     if (!homeAxis(2)) return false;
     if (!homeAxis(3)) return false;
+
     // Optional: homing für 4, 5, falls benötigt:
     // homeAxis(4);
     // homeAxis(5);
 
     // Anschließend in Kalibrierpose fahren
+
     moveToCalibrationPose();
     DEBUG_PRINTLN("Homing sequence done");
     return true;
 }
+
+
 
 // ----------------------------------------------------------------------------
 // Fahrt in Kalibrierpose nach Homing:

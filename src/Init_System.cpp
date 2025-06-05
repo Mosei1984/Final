@@ -1,7 +1,9 @@
+
 #include "Init_System.h"
 #include "Robo_Config_V1.h"
 #include "Debug.h"
 #include "Sensors.h"
+
 #include <Wire.h>
 
 // =====================
@@ -38,6 +40,7 @@ static inline float deg2rad(float deg) {
 // =====================
 
 void InitSystem::initializeSensorsAndFilters() {
+
     // --- 1) ADXL345 initialisieren ---
     if (!adxl.begin(ADXL345_I2C_ADDR)) {
         DEBUG_PRINTLN("Fehler: ADXL345 nicht gefunden!");
@@ -51,10 +54,12 @@ void InitSystem::initializeSensorsAndFilters() {
         DEBUG_PRINTLN("Fehler: VL53L0X nicht gefunden!");
         while (1) { delay(1000); }
     }
+
     // setze Messmodus auf Einzelmessung (wird bei Bedarf aufgerufen)
     delay(50);
 
     // --- 3) ADXL‐Offset‐Kalibrierung ---
+
     InitSystem::calibrateAccelerometer();
     DEBUG_PRINT("ADXL Offsets: X="); DEBUG_PRINT(accelOffsetX);
     DEBUG_PRINT("  Y="); DEBUG_PRINT(accelOffsetY);
@@ -73,6 +78,7 @@ void InitSystem::initializeSensorsAndFilters() {
     kalmanCovariance = 1.0f;
     sensorsEkfInit(height0 / 1000.0f, tiltRad);
     DEBUG_PRINT("Initial Height (mm): "); DEBUG_PRINTLN(height0);
+
 }
 
 // =====================
@@ -140,6 +146,36 @@ float InitSystem::getCorrectedLaserHeight(float tiltRad) {
     if (d < 0.0f) d = 0.0f;
     float h = d * cosf(tiltRad);
     return h;
+}
+
+// =====================
+// InitSystem::isLaserReady()
+// =====================
+
+bool InitSystem::isLaserReady() {
+    VL53L0X_RangingMeasurementData_t measure;
+    lox.rangingTest(&measure, false);
+    return measure.RangeStatus != 4; // 4 indicates out of range
+}
+
+// =====================
+// InitSystem::isLaserReady()
+// =====================
+
+bool InitSystem::isLaserReady() {
+    VL53L0X_RangingMeasurementData_t measure;
+    lox.rangingTest(&measure, false);
+    return measure.RangeStatus != 4; // 4 indicates out of range
+}
+
+// =====================
+// InitSystem::isLaserReady()
+// =====================
+
+bool InitSystem::isLaserReady() {
+    VL53L0X_RangingMeasurementData_t measure;
+    lox.rangingTest(&measure, false);
+    return measure.RangeStatus != 4; // 4 indicates out of range
 }
 
 // =====================
