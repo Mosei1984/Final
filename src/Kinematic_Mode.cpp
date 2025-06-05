@@ -4,6 +4,7 @@
 #include "Kinematic_Mode.h"
 #include "Robo_Config_V1.h" // displayPtr
 #include "Debug.h"
+#include "Sensors.h"
 
 
 // =============================================================================
@@ -17,7 +18,7 @@ static bool inSetPosition = false;
 static bool inGoToPosition = false;
 
 // Navigationsvorher (damit nur Flankenbewegungen zählen)
-
+r
 static int8_t prevNavY = 0;
 static bool   prevButton1 = false;
 static bool   prevButton2 = false;
@@ -95,6 +96,12 @@ void kinematicModeUpdate() {
     // 1) Eingänge aktualisieren
     updateRemoteInputs();
     const RemoteState* rs = getRemoteStatePointer();
+    if (sensorsEnabled) {
+        double zF, pitchF;
+        sensorsEkfUpdate(zF, pitchF);
+        DEBUG_PRINT("Zf:"); DEBUG_PRINT(zF);
+        DEBUG_PRINT(" pitch:"); DEBUG_PRINTLN(pitchF);
+    }
     bool pressed1 = rs->button1 && !prevButton1;
     bool pressed2 = rs->button2 && !prevButton2;
     prevButton1 = rs->button1;
@@ -111,6 +118,7 @@ void kinematicModeUpdate() {
         targetPos[0] += rs->leftX * stepIncrement;
         targetPos[1] += rs->leftY * stepIncrement;
         targetPos[2] += rs->rightZ * stepIncrement;
+
 
 
 
@@ -174,6 +182,7 @@ void kinematicModeUpdate() {
         }
         double solAngles[6];
         IKSettings settings;
+
         bool ok = computeInverseKinematics(targetPos, zeroOri,
                                            initialGuess, solAngles, settings);
         if (ok) {

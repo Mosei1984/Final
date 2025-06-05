@@ -1,5 +1,6 @@
 // Menu.cpp
 
+
 #include "Menu.h"
 #include "Debug.h"
 
@@ -46,6 +47,7 @@ static int8_t readNavDirectionY(float rawValue) {
 
 
 
+
 // =============================================================================
 // menuInit()
 // =============================================================================
@@ -63,6 +65,7 @@ void menuInit() {
     choiceMade = false;
     finalSelection = { -1, -1 };
 }
+
 
 
 
@@ -129,6 +132,7 @@ static void drawMainMenu() {
 }
 
 
+
 // =============================================================================
 // Zeichnet das Homing-Untermenü
 // =============================================================================
@@ -168,6 +172,7 @@ static void drawHomingSubMenu() {
 }
 
 
+
 // =============================================================================
 // Zeichnet das Kinematic-Untermenü
 // =============================================================================
@@ -178,7 +183,6 @@ static void drawKinematicSubMenu() {
         displayPtr->setFont(u8g2_font_ncenB08_tr);
         displayPtr->setCursor(0, 12);
         displayPtr->print("== Kinematic Menu ==");
-
 
         const char* items[KS_COUNT] = {
             "1. Sensoren Ein/Aus",
@@ -243,7 +247,6 @@ void menuUpdate() {
 
         // Auswahl per Button1 (Flanke)
         if (pressed1) {
-
             switch (currentMain) {
                 case MM_HOMING:
                     inHomingSub = true;
@@ -257,7 +260,6 @@ void menuUpdate() {
                     break;
                 default:
                     // Für andere Modi direkt als Wahl beenden (subIndex = -1)
-
                     finalSelection.mainIndex = currentMain;
                     finalSelection.subIndex = -1;
                     choiceMade = true;

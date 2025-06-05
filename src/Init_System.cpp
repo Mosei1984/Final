@@ -1,6 +1,7 @@
 #include "Init_System.h"
 #include "Robo_Config_V1.h"
 #include "Debug.h"
+#include "Sensors.h"
 #include <Wire.h>
 
 // =====================
@@ -63,13 +64,16 @@ void InitSystem::initializeSensorsAndFilters() {
     InitSystem::calibrateDistanceSensor();
     DEBUG_PRINT("Laser Offset (mm): "); DEBUG_PRINTLN(distanceOffset);
 
-    // --- 5) Erster Höhenmess‐Schritt & init Kalman --
+
+    // --- 5) Erster Höhenmess‐Schritt & init Kalman / EKF --
     float tiltRad = InitSystem::getTiltAngleRad();
     // Einzelmessung vom Laser abrufen
     uint16_t rawDist = lox.readRange();
     float height0 = ((float)rawDist - distanceOffset) * cosf(tiltRad);
     kalmanState      = height0;
     kalmanCovariance = 1.0f;
+    sensorsEkfInit(height0 / 1000.0f, tiltRad);
+
     DEBUG_PRINT("Initial Height (mm): "); DEBUG_PRINTLN(height0);
 }
 
