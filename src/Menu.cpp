@@ -17,10 +17,14 @@ static bool inKinematicSub   = false;
 static int8_t currentKinematicSub = 0;
 
 // Joystick-Vorzustände für Auf-/Ab-Bewegung (–1,0,+1)
+
+
 static int8_t prevMainNavY = 0;
 static int8_t prevSubNavY  = 0;
 static bool   prevButton1  = false;
 static bool   prevButton2  = false;
+
+
 
 // Wahl abgeschlossen?
 static bool choiceMade = false;
@@ -30,6 +34,8 @@ static MenuSelection finalSelection = { -1, -1 };
 // Hilfsfunktion: Liest Joystick-Vertical und gibt –1, 0 oder +1 zurück.
 //                Verwendet DEADZONE aus Robo_Config_V1.h.
 // =============================================================================
+
+
 static int8_t readNavDirectionY(float rawValue) {
     // Positive Werte entsprechen Joystick nach unten,
     // negative Werte Joystick nach oben. Wir geben
@@ -39,6 +45,8 @@ static int8_t readNavDirectionY(float rawValue) {
     return 0;
 }
 
+
+
 // =============================================================================
 // menuInit()
 // =============================================================================
@@ -46,6 +54,8 @@ void menuInit() {
     currentMain = 0;
     inHomingSub = false;
     currentHomingSub = 0;
+
+
     inKinematicSub = false;
     currentKinematicSub = 0;
     prevMainNavY = 0;
@@ -55,6 +65,8 @@ void menuInit() {
     choiceMade = false;
     finalSelection = { -1, -1 };
 }
+
+
 
 // =============================================================================
 // menuSelectionAvailable()
@@ -90,6 +102,7 @@ static void drawMainMenu() {
         displayPtr->setCursor(0, 12);
         displayPtr->print("== Hauptmenü ==");
 
+
         const char* items[MM_COUNT] = {
             "Homing",
             "Joint Mode",
@@ -108,6 +121,7 @@ static void drawMainMenu() {
             }
             displayPtr->print(items[i]);
         }
+
     } while (displayPtr->nextPage());
 }
 
@@ -130,6 +144,7 @@ static void drawHomingSubMenu() {
             "5. Zurueck"
         };
 
+
         for (int8_t i = 0; i < HS_COUNT; i++) {
             int y = 16 + i * 10;
             if (i == currentHomingSub) {
@@ -137,6 +152,7 @@ static void drawHomingSubMenu() {
                 displayPtr->setCursor(8, y);
             } else {
                 displayPtr->setCursor(8, y);
+
             }
             displayPtr->print(items[i]);
         }
@@ -161,6 +177,7 @@ static void drawKinematicSubMenu() {
             "4. Zurueck"
         };
 
+
         for (int8_t i = 0; i < KS_COUNT; i++) {
             int y = 16 + i * 10;
             if (i == currentKinematicSub) {
@@ -168,6 +185,7 @@ static void drawKinematicSubMenu() {
                 displayPtr->setCursor(8, y);
             } else {
                 displayPtr->setCursor(8, y);
+
             }
             displayPtr->print(items[i]);
         }
@@ -183,11 +201,13 @@ void menuUpdate() {
 
     // 1) Eingänge aktualisieren
     updateRemoteInputs();
+
     const RemoteState* rs = getRemoteStatePointer();
     bool pressed1 = rs->button1 && !prevButton1;
     bool pressed2 = rs->button2 && !prevButton2;
     prevButton1 = rs->button1;
     prevButton2 = rs->button2;
+
 
     // 2) Navigation im Menü
     // Hauptmenü vs. Untermenüs:
@@ -208,6 +228,7 @@ void menuUpdate() {
 
         // Auswahl per Button1 (Flanke)
         if (pressed1) {
+
             switch (currentMain) {
                 case MM_HOMING:
                     inHomingSub = true;
@@ -219,6 +240,8 @@ void menuUpdate() {
                     break;
                 default:
                     // Für andere Modi direkt als Wahl beenden (subIndex = -1)
+
+
                     finalSelection.mainIndex = currentMain;
                     finalSelection.subIndex = -1;
                     choiceMade = true;
@@ -226,6 +249,8 @@ void menuUpdate() {
                     Serial.println(currentMain);
                     break;
             }
+
+
         }
 
         // Zeichne Hauptmenü
@@ -245,6 +270,9 @@ void menuUpdate() {
         }
         prevSubNavY = dirY;
 
+
+
+
         // Auswahl mit Button1 oder sofort zurück mit Button2
         if (pressed1) {
             if (currentHomingSub == HS_HOMING_BACK) {
@@ -253,17 +281,21 @@ void menuUpdate() {
                 currentHomingSub = 0;
             } else {
                 // Auswahl getroffen -> mainIndex=MM_HOMING, subIndex=currentHomingSub
+
                 finalSelection.mainIndex = MM_HOMING;
                 finalSelection.subIndex = currentHomingSub;
                 choiceMade = true;
                 Serial.print("Homing select sub=");
                 Serial.println(currentHomingSub);
             }
+
         }
         if (pressed2) {
             inHomingSub = false;
             currentHomingSub = 0;
             Serial.println("Homing menu exit");
+        }
+
         }
 
         drawHomingSubMenu();
@@ -281,6 +313,8 @@ void menuUpdate() {
             }
         }
         prevSubNavY = dirY;
+
+
 
         // Auswahl mit Button1 oder Zurück mit Button2
         if (pressed1) {
@@ -302,6 +336,11 @@ void menuUpdate() {
             currentKinematicSub = 0;
             Serial.println("Kinematic menu exit");
         }
+
+
+        }
+
+
 
         drawKinematicSubMenu();
         return;
