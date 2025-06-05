@@ -89,6 +89,7 @@ bool areSensorsEnabled() {
 // =============================================================================
 // kinematicModeUpdate()
 // =============================================================================
+
 void kinematicModeUpdate() {
     // 1) Eingänge aktualisieren
     updateRemoteInputs();
@@ -109,6 +110,7 @@ void kinematicModeUpdate() {
         targetPos[0] += rs->leftX * stepIncrement;
         targetPos[1] += rs->leftY * stepIncrement;
         targetPos[2] += rs->rightZ * stepIncrement;
+
 
         // Begrenze Zielkoordinaten z.B. [–0.5m..+0.5m]
         for (int i = 0; i < 3; i++) {
@@ -170,6 +172,7 @@ void kinematicModeUpdate() {
         }
         double solAngles[6];
         IKSettings settings;
+
 
 
 
@@ -247,8 +250,19 @@ void kinematicModeUpdate() {
         }
         Serial.print("Kinematic menu sub: ");
         Serial.println(currentSub);
+
+    }
+    if (navY != prevNavY) {
+        if (navY == -1) {
+            currentSub = (currentSub - 1 + KS_COUNT) % KS_COUNT;
+        } else if (navY == +1) {
+            currentSub = (currentSub + 1) % KS_COUNT;
+        }
+        Serial.print("Kinematic menu sub: ");
+        Serial.println(currentSub);
     }
     prevNavY = navY;
+
 
 
     // Auswahl mit Button1
@@ -275,6 +289,7 @@ void kinematicModeUpdate() {
                 inGoToPosition = true;
                 Serial.println("Execute IK move");
                 break;
+
 
             case KS_KIN_BACK:
                 // Beende Kinematic Mode

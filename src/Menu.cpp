@@ -18,10 +18,12 @@ static int8_t currentKinematicSub = 0;
 
 // Joystick-Vorzustände für Auf-/Ab-Bewegung (–1,0,+1)
 
+
 static int8_t prevMainNavY = 0;
 static int8_t prevSubNavY  = 0;
 static bool   prevButton1  = false;
 static bool   prevButton2  = false;
+
 
 
 // Wahl abgeschlossen?
@@ -33,6 +35,7 @@ static MenuSelection finalSelection = { -1, -1 };
 //                Verwendet DEADZONE aus Robo_Config_V1.h.
 // =============================================================================
 
+
 static int8_t readNavDirectionY(float rawValue) {
     // Positive Werte entsprechen Joystick nach unten,
     // negative Werte Joystick nach oben. Wir geben
@@ -43,6 +46,7 @@ static int8_t readNavDirectionY(float rawValue) {
 }
 
 
+
 // =============================================================================
 // menuInit()
 // =============================================================================
@@ -50,6 +54,7 @@ void menuInit() {
     currentMain = 0;
     inHomingSub = false;
     currentHomingSub = 0;
+
 
     inKinematicSub = false;
     currentKinematicSub = 0;
@@ -60,6 +65,7 @@ void menuInit() {
     choiceMade = false;
     finalSelection = { -1, -1 };
 }
+
 
 
 // =============================================================================
@@ -220,7 +226,6 @@ void menuUpdate() {
         }
         prevMainNavY = dirY;
 
-
         // Auswahl per Button1 (Flanke)
         if (pressed1) {
 
@@ -236,6 +241,7 @@ void menuUpdate() {
                 default:
                     // Für andere Modi direkt als Wahl beenden (subIndex = -1)
 
+
                     finalSelection.mainIndex = currentMain;
                     finalSelection.subIndex = -1;
                     choiceMade = true;
@@ -243,6 +249,7 @@ void menuUpdate() {
                     Serial.println(currentMain);
                     break;
             }
+
 
         }
 
@@ -262,6 +269,7 @@ void menuUpdate() {
             }
         }
         prevSubNavY = dirY;
+
 
 
 
@@ -290,7 +298,6 @@ void menuUpdate() {
 
         }
 
-
         drawHomingSubMenu();
         return;
     }
@@ -306,6 +313,7 @@ void menuUpdate() {
             }
         }
         prevSubNavY = dirY;
+
 
 
         // Auswahl mit Button1 oder Zurück mit Button2
@@ -331,6 +339,7 @@ void menuUpdate() {
 
 
         }
+
 
 
         drawKinematicSubMenu();

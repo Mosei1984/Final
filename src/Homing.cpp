@@ -27,7 +27,7 @@ static void setStepperPositionToOffset(uint8_t axis, long offsetSteps) {
 // ----------------------------------------------------------------------------
 // Homing einer einzelnen Achse
 // 1) Fahrt mit HOMING_FAST_SPEED in Richtung HOMING_DIRECTION[axis], bis Endstop auslöst
-// 2) Backoff um BACKOFF_STEPS
+// 2) Backoff um HOMING_BACKOFF_STEPS
 // 3) Interne Position auf HOMEPOS_DEG-Offset setzen und currentJointAngles aktualisieren
 // ----------------------------------------------------------------------------
 void homeAxis(uint8_t axis) {
@@ -57,7 +57,7 @@ void homeAxis(uint8_t axis) {
     delay(10);
 
     // Backoff in Gegenrichtung
-    long backoff = BACKOFF_STEPS;
+    long backoff = HOMING_BACKOFF_STEPS;
     if (HOMING_DIRECTION[axis]) {
         // Umkehr auf negative logische Richtung
         digitalWrite(DIR_PINS[axis], MOTOR_DIRECTION[axis] ? HIGH : LOW);

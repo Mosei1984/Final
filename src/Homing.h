@@ -29,11 +29,10 @@ constexpr float ELBOW_MAX_ANGLE_DEG    =  120.0f;
 constexpr float WRIST_PITCH_MAX_DEG    =  180.0f; 
 
 //
-// --- Backoff‐Parameter ---
-// Wie viele Schritte sollen wir nach Endschalter‐Erkennung zurückfahren, damit
-// wir einen definierten Wiederanlauf‐Punkt haben. 
-//
-constexpr long BACKOFF_STEPS = 200; // in Microsteps (Abhängig von deinem Mechanismus)
+// --- Backoff-Parameter ---
+// Wie viele Schritte sollen wir nach Endschalter-Erkennung zurueckfahren, damit
+// wir einen definierten Wiederanlauf-Punkt haben.
+// Der konkrete Wert ist in Robo_Config_V1.h als HOMING_BACKOFF_STEPS festgelegt.
 
 //
 // --- Funktionen und globale Flags ---
