@@ -49,9 +49,9 @@ void jointModeUpdate() {
     //    readNavDirectionY analog: über 0.5 → –1 (oben), unter –0.5 → +1 (unten)
     int8_t navY = 0;
     if (rs->rightY > 0.5f) {
-        navY = -1;  // joystick nach oben → Auswahl nach oben
-    } else if (rs->rightY < -0.5f) {
         navY = +1;  // joystick nach unten → Auswahl nach unten
+    } else if (rs->rightY < -0.5f) {
+        navY = -1;  // joystick nach oben → Auswahl nach oben
     }
 
     if (navY != prevSelectNavY) {

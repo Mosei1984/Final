@@ -117,7 +117,7 @@ void homeAxis(uint8_t axis) {
 void homeAllAxes() {
     // Endstop-Pins auf INPUT_PULLUP
     for (uint8_t i = 0; i < 6; i++) {
-        pinMode(ENDSTOP_PINS[i], INPUT_PULLDOWN);
+        pinMode(ENDSTOP_PINS[i], INPUT_PULLUP);
     }
 
     // Homing Reihenfolge
