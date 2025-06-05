@@ -204,6 +204,7 @@ void loop() {
       currentStatus = STATUS_JOINT;
       setStatusLED(currentStatus);
 
+      showMessage("Joint Mode", "Button2=Back");
       jointModeInit();
       returnToMenu = false;
       while (!returnToMenu) {
@@ -213,16 +214,20 @@ void loop() {
           returnToMenu = true;
         }
       }
+
+      showMessage("Joint Mode", "done");
       jointModeStop();
 
       currentStatus = STATUS_IDLE;
       setStatusLED(currentStatus);
+
     }
     // KinematicMode
     else if (sel.mainIndex == MM_KINEMATIC) {
       currentStatus = STATUS_KINEMATIC;
       setStatusLED(currentStatus);
 
+      showMessage("Kinematic", "Button2=Back");
       kinematicModeInit();
       returnToMenu = false;
       while (!returnToMenu) {
@@ -232,10 +237,13 @@ void loop() {
           returnToMenu = true;
         }
       }
+
+      showMessage("Kinematic", "done");
       kinematicModeStop();
 
       currentStatus = STATUS_IDLE;
       setStatusLED(currentStatus);
+
     }
     // G-Code Mode (Platzhalter)
     else if (sel.mainIndex == MM_GCODE) {
