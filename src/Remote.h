@@ -6,7 +6,6 @@
 #include <Arduino.h>
 #include "Robo_Config_V1.h"  // Enthält joyLXCenter, joyLYCenter, joyRZCenter, joyRYawCenter, DEADZONE, SERVO_POT_PIN
 
-
 // =====================
 // Strukturen & Datentypen
 // =====================

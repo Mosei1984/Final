@@ -22,6 +22,21 @@ U8G2_SSD1306_128X64_NONAME_F_HW_I2C* oled;
 
 // Timer für die STEP-ISR (1 kHz)
 IntervalTimer stepTimer;
+static bool stepTimerRunning = false;
+
+static void startStepTimer() {
+  if (!stepTimerRunning) {
+    stepTimer.begin(stepperISR, 500);  // 2 kHz
+    stepTimerRunning = true;
+  }
+}
+
+static void stopStepTimer() {
+  if (stepTimerRunning) {
+    stepTimer.end();
+    stepTimerRunning = false;
+  }
+}
 
 static void startStepTimer() {
   stepTimer.begin(stepperISR, 500);  // 2 kHz
@@ -74,7 +89,11 @@ static void setStatusLED(SystemStatus s) {
       color = pixels.Color(0, 200, 0);   // Grün
       break;
     case STATUS_KINEMATIC:
-      color = pixels.Color(0, 150, 150); // Cyan
+      if (areSensorsEnabled()) {
+        color = pixels.Color(150, 0, 150); // Magenta wenn Sensoren aktiv
+      } else {
+        color = pixels.Color(0, 150, 150); // Cyan
+      }
       break;
     case STATUS_IDLE:
       color = pixels.Color(0, 50, 0);    // Dunkelgrün (ruhig)
@@ -91,6 +110,18 @@ static void setStatusLED(SystemStatus s) {
     pixels.setPixelColor(i, color);
   }
   pixels.show();
+}
+
+// Kleine Hilfsfunktion, um eine zweizeilige Meldung auf dem Display anzuzeigen
+static void showMessage(const char* line1, const char* line2) {
+  if (!displayPtr) return;
+  displayPtr->clearBuffer();
+  displayPtr->setFont(u8g2_font_ncenB08_tr);
+  displayPtr->setCursor(0, 20);
+  displayPtr->print(line1);
+  displayPtr->setCursor(0, 40);
+  displayPtr->print(line2);
+  displayPtr->sendBuffer();
 }
 
 // Kleine Hilfsfunktion, um eine zweizeilige Meldung auf dem Display anzuzeigen
@@ -170,6 +201,7 @@ static void handleHomingSub(int8_t subIndex) {
 }
 
 
+
 // -----------------------------------------------------------------------------
 // setup()
 // -----------------------------------------------------------------------------
@@ -217,6 +249,7 @@ void loop() {
   menuUpdate();
 
 
+
   // 2) Wenn eine Menü-Auswahl vorliegt, handle sie
   if (menuSelectionAvailable()) {
     MenuSelection sel = menuGetSelection();
@@ -232,6 +265,7 @@ void loop() {
       currentStatus = STATUS_JOINT;
       setStatusLED(currentStatus);
 
+
       showMessage("Joint Mode", "Button2=Back");
       jointModeInit();
       returnToMenu = false;
@@ -242,20 +276,17 @@ void loop() {
           returnToMenu = true;
         }
       }
-
       showMessage("Joint Mode", "done");
       jointModeStop();
 
       currentStatus = STATUS_IDLE;
       setStatusLED(currentStatus);
 
-
     }
     // KinematicMode
     else if (sel.mainIndex == MM_KINEMATIC) {
       currentStatus = STATUS_KINEMATIC;
       setStatusLED(currentStatus);
-
 
       showMessage("Kinematic", "Button2=Back");
       kinematicModeInit();
