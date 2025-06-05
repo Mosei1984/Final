@@ -1,7 +1,9 @@
+
 #include "Init_System.h"
 #include "Robo_Config_V1.h"
 #include "Debug.h"
 #include "Sensors.h"
+
 #include <Wire.h>
 
 // =====================
@@ -40,7 +42,9 @@ static inline float deg2rad(float deg) {
 void InitSystem::initializeSensorsAndFilters() {
     // --- 1) ADXL345 initialisieren ---
     if (!adxl.begin()) {
+
         DEBUG_PRINTLN("Fehler: ADXL345 nicht gefunden!");
+
         while (1) { delay(1000); }
     }
     adxl.setRange(ADXL345_RANGE_4_G);
@@ -48,13 +52,16 @@ void InitSystem::initializeSensorsAndFilters() {
 
     // --- 2) VL53L0X initialisieren ---
     if (!lox.begin()) {
+
         DEBUG_PRINTLN("Fehler: VL53L0X nicht gefunden!");
+
         while (1) { delay(1000); }
     }
     // setze Messmodus auf Einzelmessung (wird bei Bedarf aufgerufen)
     delay(50);
 
     // --- 3) ADXL‐Offset‐Kalibrierung ---
+
     InitSystem::calibrateAccelerometer();
     DEBUG_PRINT("ADXL Offsets: X="); DEBUG_PRINT(accelOffsetX);
     DEBUG_PRINT("  Y="); DEBUG_PRINT(accelOffsetY);
@@ -73,6 +80,7 @@ void InitSystem::initializeSensorsAndFilters() {
     kalmanCovariance = 1.0f;
     sensorsEkfInit(height0 / 1000.0f, tiltRad);
     DEBUG_PRINT("Initial Height (mm): "); DEBUG_PRINTLN(height0);
+
 }
 
 // =====================

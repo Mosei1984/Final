@@ -1,8 +1,10 @@
 // JointMode.cpp
 
+
 #include "Joint_Mode.h"
 #include "Robo_Config_V1.h" // fuer displayPtr
 #include "Debug.h"
+
 
 // =====================
 // Interne State-Variablen
@@ -49,6 +51,7 @@ void jointModeUpdate() {
 
     // 2) Achsenauswahl über rechten Joystick Y-Achse
     //    readNavDirectionY analog: über 0.5 → –1 (oben), unter –0.5 → +1 (unten)
+
     int8_t navY = 0;
     if (rs->rightY > 0.5f) {
         navY = +1;  // joystick nach unten → Auswahl nach unten
@@ -65,6 +68,7 @@ void jointModeUpdate() {
         DEBUG_PRINT("Select axis: ");
         DEBUG_PRINTLN(selectedAxis);
     }
+
     prevSelectNavY = navY;
 
     // 3) Geschwindigkeit der ausgewählten Achse steuern via linker Joystick Y-Achse
@@ -96,3 +100,4 @@ void jointModeUpdate() {
         displayPtr->sendBuffer();
     }
 }
+
