@@ -57,74 +57,71 @@ static int8_t readNavDirectionY(float rawValue) {
 void menuInit() {
     currentMain = 0;
     inHomingSub = false;
-    currentHomingSub = 0;
-
-    inKinematicSub = false;
-    currentKinematicSub = 0;
-    prevMainNavY = 0;
-    prevSubNavY = 0;
-    prevButton1  = false;
-    prevButton2  = false;
-    choiceMade = false;
-    finalSelection = { -1, -1 };
-}
-
-
-
-
-
-
-
-// =============================================================================
-// menuSelectionAvailable()
-// =============================================================================
-bool menuSelectionAvailable() {
-    return choiceMade;
-}
-
-// =============================================================================
-// menuGetSelection()
-// =============================================================================
-MenuSelection menuGetSelection() {
-    return finalSelection;
-}
-
-// =============================================================================
-// menuResetSelection()
-// =============================================================================
-void menuResetSelection() {
-    choiceMade = false;
-    finalSelection = { -1, -1 };
-}
-
-// =============================================================================
-// Zeichnet das Hauptmenü auf displayPtr
-// =============================================================================
 static void drawMainMenu() {
     if (!displayPtr) return;
-    displayPtr->firstPage();
-    do {
-        displayPtr->setFont(u8g2_font_ncenB08_tr);
-        // Menütitel
-        displayPtr->setCursor(0, 12);
-        displayPtr->print("== Hauptmenü ==");
+    displayPtr->clearBuffer();
+    displayPtr->setFont(u8g2_font_ncenB08_tr);
+    // Menütitel
+    displayPtr->setCursor(0, 12);
+    displayPtr->print("== Hauptmenü ==");
+    const int maxLines = 5;
+    int start = 0;
+    if (currentMain >= maxLines) {
+        start = currentMain - maxLines + 1;
+    }
+    for (int8_t i = start; i < MM_COUNT && i < start + maxLines; i++) {
+        int y = 16 + (i - start) * 10;
+        if (i == currentMain) {
+            displayPtr->drawStr(0, y, ">");
+            displayPtr->setCursor(8, y);
+        } else {
+            displayPtr->setCursor(8, y);
+        displayPtr->print(items[i]);
+    }
+    displayPtr->sendBuffer();
+static void drawHomingSubMenu() {
+    if (!displayPtr) return;
+    displayPtr->clearBuffer();
+    displayPtr->setFont(u8g2_font_ncenB08_tr);
+    displayPtr->setCursor(0, 12);
+    displayPtr->print("== Homing Menu ==");
+    const int maxLines = 5;
+    int start = 0;
+    if (currentHomingSub >= maxLines) {
+        start = currentHomingSub - maxLines + 1;
+    }
+    for (int8_t i = start; i < HS_COUNT && i < start + maxLines; i++) {
+        int y = 16 + (i - start) * 10;
+        if (i == currentHomingSub) {
+            displayPtr->drawStr(0, y, ">");
+            displayPtr->setCursor(8, y);
+        } else {
+            displayPtr->setCursor(8, y);
+        displayPtr->print(items[i]);
+    }
+    displayPtr->sendBuffer();
+static void drawKinematicSubMenu() {
+    if (!displayPtr) return;
+    displayPtr->clearBuffer();
+    displayPtr->setFont(u8g2_font_ncenB08_tr);
+    displayPtr->setCursor(0, 12);
+    displayPtr->print("== Kinematic Menu ==");
 
-
-        const char* items[MM_COUNT] = {
-            "Homing",
-            "Joint Mode",
-            "Kinematic Mode",
-            "G-Code Mode",
-            "Teach/Play Mode"
-        };
-
-        const int maxLines = 5;
-        int start = 0;
-        if (currentMain >= maxLines) {
-            start = currentMain - maxLines + 1;
-        }
-        for (int8_t i = start; i < MM_COUNT && i < start + maxLines; i++) {
-            int y = 16 + (i - start) * 10;
+    const int maxLines = 5;
+    int start = 0;
+    if (currentKinematicSub >= maxLines) {
+        start = currentKinematicSub - maxLines + 1;
+    }
+    for (int8_t i = start; i < KS_COUNT && i < start + maxLines; i++) {
+        int y = 16 + (i - start) * 10;
+        if (i == currentKinematicSub) {
+            displayPtr->drawStr(0, y, ">");
+            displayPtr->setCursor(8, y);
+        } else {
+            displayPtr->setCursor(8, y);
+        displayPtr->print(items[i]);
+    }
+    displayPtr->sendBuffer();
             if (i == currentMain) {
                 displayPtr->drawStr(0, y, ">");
                 displayPtr->setCursor(8, y);
