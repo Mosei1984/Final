@@ -57,7 +57,7 @@ void homeAllAxes();
 
 /**
  * @brief  Checkt für eine Achse, ob deren Endschalter ausgelöst ist.
- *         Rückgabe: true = Endschalter geschlossen (LOW oder HIGH, je nach Inversion).
+ *         Bei NC-Schaltern mit Pull-Up bedeutet HIGH = gedrückt. Rückgabe: true bei HIGH.
  *         Implementierung siehe Homing.cpp.
  */
 bool isEndstopPressed(uint8_t axis);

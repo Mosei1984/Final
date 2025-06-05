@@ -10,10 +10,11 @@ static inline float deg2rad(float deg) {
 }
 
 // ----------------------------------------------------------------------------
-// Prüft, ob Endstop (INPUT_PULLUP) der Achse gedrückt ist (LOW = gedrückt)
+// Prüft, ob Endstop (INPUT_PULLUP) der Achse gedrückt ist (HIGH = gedrückt)
+// Die Schalter sind "NC" zu GND und oeffnen beim Druecken.
 // ----------------------------------------------------------------------------
 bool isEndstopPressed(uint8_t axis) {
-    return (digitalRead(ENDSTOP_PINS[axis]) == LOW);
+    return (digitalRead(ENDSTOP_PINS[axis]) == HIGH);
 }
 
 // ----------------------------------------------------------------------------
@@ -30,6 +31,8 @@ static void setStepperPositionToOffset(uint8_t axis, long offsetSteps) {
 // 3) Interne Position auf HOMEPOS_DEG-Offset setzen und currentJointAngles aktualisieren
 // ----------------------------------------------------------------------------
 void homeAxis(uint8_t axis) {
+    Serial.print("Homing axis ");
+    Serial.println(axis);
     // 1) Homingfahrt starten
     float fastSpeed = HOMING_FAST_SPEED;
     if (HOMING_DIRECTION[axis]) {
@@ -109,15 +112,19 @@ void homeAxis(uint8_t axis) {
     // Motor deaktivieren (Enable HIGH)
     digitalWrite(ENABLE_PINS[axis], HIGH);
     delay(10);
+    Serial.print("Axis ");
+    Serial.print(axis);
+    Serial.println(" homed");
 }
 
 // ----------------------------------------------------------------------------
 // Homing aller Achsen (0..3) und anschließende Kalibrierpose
 // ----------------------------------------------------------------------------
 void homeAllAxes() {
+    Serial.println("Starting homing sequence");
     // Endstop-Pins auf INPUT_PULLUP
     for (uint8_t i = 0; i < 6; i++) {
-        pinMode(ENDSTOP_PINS[i], INPUT_PULLDOWN);
+        pinMode(ENDSTOP_PINS[i], INPUT_PULLUP);
     }
 
     // Homing Reihenfolge
@@ -131,6 +138,7 @@ void homeAllAxes() {
 
     // Anschließend in Kalibrierpose fahren
     moveToCalibrationPose();
+    Serial.println("Homing sequence done");
 }
 
 // ----------------------------------------------------------------------------

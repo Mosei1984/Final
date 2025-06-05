@@ -13,7 +13,8 @@
 extern const uint8_t JOY_LX_PIN;   // Analog-Pin für linken Joystick X-Achse
 extern const uint8_t JOY_LY_PIN;   // Analog-Pin für linken Joystick Y-Achse
 extern const uint8_t JOY_RZ_PIN;   // Analog-Pin für rechten Joystick Z-Achse
-extern const uint8_t JOY_RY_PIN;   // Analog-Pin für rechten Joystick Yaw-Achse
+// Rechte Joystick-Yaw-Achse
+extern const uint8_t JOY_RYAW_PIN; // Analog-Pin für rechten Joystick Yaw-Achse
 
 extern const uint8_t BUTTON1_PIN;  // Digital-Pin für Button 1
 extern const uint8_t BUTTON2_PIN;  // Digital-Pin für Button 2

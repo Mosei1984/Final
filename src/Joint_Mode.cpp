@@ -49,20 +49,19 @@ void jointModeUpdate() {
     //    readNavDirectionY analog: über 0.5 → –1 (oben), unter –0.5 → +1 (unten)
     int8_t navY = 0;
     if (rs->rightY > 0.5f) {
-        navY = -1;  // joystick nach oben → Auswahl nach oben
-    } else if (rs->rightY < -0.5f) {
         navY = +1;  // joystick nach unten → Auswahl nach unten
+    } else if (rs->rightY < -0.5f) {
+        navY = -1;  // joystick nach oben → Auswahl nach oben
     }
 
     if (navY != prevSelectNavY) {
-        // Flankenwechsel erkannt: nur dann aktualisieren
         if (navY == -1) {
-            // nach oben: vorherige Achse (mit Wrap-Around)
             selectedAxis = (selectedAxis - 1 + 6) % 6;
         } else if (navY == +1) {
-            // nach unten: nächste Achse
             selectedAxis = (selectedAxis + 1) % 6;
         }
+        Serial.print("Select axis: ");
+        Serial.println(selectedAxis);
     }
     prevSelectNavY = navY;
 
