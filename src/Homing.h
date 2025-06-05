@@ -28,7 +28,7 @@ constexpr float SHOULDER_MAX_ANGLE_DEG =  150.0f;
 constexpr float ELBOW_MAX_ANGLE_DEG    =  120.0f; 
 constexpr float WRIST_PITCH_MAX_DEG    =  180.0f; 
 
-//
+
 // --- Backoff- und Timeout-Parameter ---
 // Wie viele Schritte sollen wir nach Endschalter-Erkennung zurueckfahren, damit
 // wir einen definierten Wiederanlauf-Punkt haben.
@@ -37,6 +37,7 @@ constexpr float WRIST_PITCH_MAX_DEG    =  180.0f;
 // Zusätzliche Sicherheit: Maximale Zeit für eine Homingfahrt, um Endlosschleifen
 // bei defekten Endschaltern zu vermeiden (in Millisekunden).
 constexpr unsigned long MAX_HOMING_TIME_MS = 60000; // 1 Minute
+
 
 //
 // --- Funktionen und globale Flags ---

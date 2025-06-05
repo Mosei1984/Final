@@ -9,11 +9,13 @@
 #include "Remote.h"
 #include "Menu.h"
 #include "Joint_Mode.h"
+
 #include "Kinematic_Mode.h"
 #include "Homing.h"
 #include "Stepper_Config.h"
 #include "Init_System.h"
 #include "SystemStatus.h"
+
 
 // -----------------------------------------------------------------------------
 // Globale Objekte
@@ -21,6 +23,7 @@
 
 // OLED-Display (SSD1306 I²C, Full-Buffer)
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C* oled;
+
 
 // Timer für die STEP-ISR (2 kHz)
 IntervalTimer stepTimer;
@@ -40,21 +43,26 @@ static void stopStepTimer() {
   }
 }
 
+
 // NeoPixel-Status-LEDs
 Adafruit_NeoPixel pixels(NUM_PIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
 // Flag, um nach einem Modus zurück ins Menü zu springen
 static bool returnToMenu = false;
 
+
 // Aktueller System-Status (für LEDs)
 static SystemStatus currentStatus = STATUS_IDLE;
+
 
 // -----------------------------------------------------------------------------
 // LED-Status-Funktion
 // -----------------------------------------------------------------------------
 // Setzt alle NeoPixels auf eine Farbe passend zum SystemStatus.
 // -----------------------------------------------------------------------------
+
 void setStatusLED(SystemStatus s) {
+
   uint32_t color;
   switch (s) {
     case STATUS_MENU:
@@ -66,6 +74,7 @@ void setStatusLED(SystemStatus s) {
     case STATUS_JOINT:
       color = pixels.Color(0, 200, 0);   // Grün
       break;
+
     case STATUS_KINEMATIC:
       if (areSensorsEnabled()) {
         color = pixels.Color(150, 0, 150); // Magenta wenn Sensoren aktiv
@@ -73,6 +82,7 @@ void setStatusLED(SystemStatus s) {
         color = pixels.Color(0, 150, 150); // Cyan
       }
       break;
+
     case STATUS_IDLE:
       color = pixels.Color(0, 50, 0);    // Dunkelgrün (ruhig)
       break;
@@ -102,9 +112,70 @@ static void showMessage(const char* line1, const char* line2) {
   displayPtr->sendBuffer();
 }
 
+// Kleine Hilfsfunktion, um eine zweizeilige Meldung auf dem Display anzuzeigen
+static void showMessage(const char* line1, const char* line2) {
+  if (!displayPtr) return;
+  displayPtr->clearBuffer();
+  displayPtr->setFont(u8g2_font_ncenB08_tr);
+  displayPtr->setCursor(0, 20);
+  displayPtr->print(line1);
+  displayPtr->setCursor(0, 40);
+  displayPtr->print(line2);
+  displayPtr->sendBuffer();
+}
+
+// Kleine Hilfsfunktion, um eine zweizeilige Meldung auf dem Display anzuzeigen
+static void showMessage(const char* line1, const char* line2) {
+  if (!displayPtr) return;
+  displayPtr->clearBuffer();
+  displayPtr->setFont(u8g2_font_ncenB08_tr);
+  displayPtr->setCursor(0, 20);
+  displayPtr->print(line1);
+  displayPtr->setCursor(0, 40);
+  displayPtr->print(line2);
+  displayPtr->sendBuffer();
+}
+
+// Kleine Hilfsfunktion, um eine zweizeilige Meldung auf dem Display anzuzeigen
+static void showMessage(const char* line1, const char* line2) {
+  if (!displayPtr) return;
+  displayPtr->clearBuffer();
+  displayPtr->setFont(u8g2_font_ncenB08_tr);
+  displayPtr->setCursor(0, 20);
+  displayPtr->print(line1);
+  displayPtr->setCursor(0, 40);
+  displayPtr->print(line2);
+  displayPtr->sendBuffer();
+}
+
+// Kleine Hilfsfunktion, um eine zweizeilige Meldung auf dem Display anzuzeigen
+static void showMessage(const char* line1, const char* line2) {
+  if (!displayPtr) return;
+  displayPtr->clearBuffer();
+  displayPtr->setFont(u8g2_font_ncenB08_tr);
+  displayPtr->setCursor(0, 20);
+  displayPtr->print(line1);
+  displayPtr->setCursor(0, 40);
+  displayPtr->print(line2);
+  displayPtr->sendBuffer();
+}
+
+// Kleine Hilfsfunktion, um eine zweizeilige Meldung auf dem Display anzuzeigen
+static void showMessage(const char* line1, const char* line2) {
+  if (!displayPtr) return;
+  displayPtr->clearBuffer();
+  displayPtr->setFont(u8g2_font_ncenB08_tr);
+  displayPtr->setCursor(0, 20);
+  displayPtr->print(line1);
+  displayPtr->setCursor(0, 40);
+  displayPtr->print(line2);
+  displayPtr->sendBuffer();
+}
+
 // -----------------------------------------------------------------------------
 // Wrapper für Homing-Untermenüaktionen
 // -----------------------------------------------------------------------------
+
 static void handleHomingSub(int8_t subIndex) {
   currentStatus = STATUS_HOMING;
   setStatusLED(currentStatus);
@@ -113,6 +184,7 @@ static void handleHomingSub(int8_t subIndex) {
   bool success = true;
 
   switch (subIndex) {
+
     case HS_SINGLE_AXIS:
       // Homing jeder Achse einzeln (0..5)
       for (uint8_t i = 0; i < 6; i++) {
@@ -160,6 +232,7 @@ static void handleHomingSub(int8_t subIndex) {
 
     default:
       break;
+
   }
 
   if (success) {
@@ -169,6 +242,11 @@ static void handleHomingSub(int8_t subIndex) {
   currentStatus = STATUS_IDLE;
   setStatusLED(currentStatus);
 }
+
+
+
+
+
 
 // -----------------------------------------------------------------------------
 // setup()
@@ -199,9 +277,11 @@ void setup() {
   configureSteppers();
   setupMultiStepper();
 
+
   // --- 6) STEP-Timer (2 kHz) ---
   // Hoehere Frequenz erlaubt schnellere Schrittgeschwindigkeiten
   startStepTimer();
+
 
   // --- 7) Menü initialisieren ---
   currentStatus = STATUS_MENU;
@@ -213,8 +293,10 @@ void setup() {
 // loop()
 // -----------------------------------------------------------------------------
 void loop() {
+
   // 1) Menü-Update (updateRemoteInputs wird in menuUpdate aufgerufen)
   menuUpdate();
+
 
   // 2) Wenn eine Menü-Auswahl vorliegt, handle sie
   if (menuSelectionAvailable()) {
@@ -231,6 +313,7 @@ void loop() {
       currentStatus = STATUS_JOINT;
       setStatusLED(currentStatus);
 
+
       showMessage("Joint Mode", "Button2=Back");
       jointModeInit();
       returnToMenu = false;
@@ -246,6 +329,7 @@ void loop() {
 
       currentStatus = STATUS_IDLE;
       setStatusLED(currentStatus);
+
     }
     // KinematicMode
     else if (sel.mainIndex == MM_KINEMATIC) {
@@ -267,6 +351,7 @@ void loop() {
 
       currentStatus = STATUS_IDLE;
       setStatusLED(currentStatus);
+
     }
     // G-Code Mode (Platzhalter)
     else if (sel.mainIndex == MM_GCODE) {
