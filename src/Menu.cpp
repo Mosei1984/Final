@@ -1,7 +1,9 @@
 // Menu.cpp
 
+
 #include "Menu.h"
 #include "Debug.h"
+
 
 // =============================================================================
 // Interne State-Variablen
@@ -18,10 +20,12 @@ static bool inKinematicSub   = false;
 static int8_t currentKinematicSub = 0;
 
 // Joystick-Vorzustände für Auf-/Ab-Bewegung (–1,0,+1)
+
 static int8_t prevMainNavY = 0;
 static int8_t prevSubNavY  = 0;
 static bool   prevButton1  = false;
 static bool   prevButton2  = false;
+
 
 // Wahl abgeschlossen?
 static bool choiceMade = false;
@@ -31,6 +35,7 @@ static MenuSelection finalSelection = { -1, -1 };
 // Hilfsfunktion: Liest Joystick-Vertical und gibt –1, 0 oder +1 zurück.
 //                Verwendet DEADZONE aus Robo_Config_V1.h.
 // =============================================================================
+
 static int8_t readNavDirectionY(float rawValue) {
     // Positive Werte entsprechen Joystick nach unten,
     // negative Werte Joystick nach oben. Wir geben
@@ -40,6 +45,13 @@ static int8_t readNavDirectionY(float rawValue) {
     return 0;
 }
 
+
+
+
+
+
+
+
 // =============================================================================
 // menuInit()
 // =============================================================================
@@ -47,6 +59,7 @@ void menuInit() {
     currentMain = 0;
     inHomingSub = false;
     currentHomingSub = 0;
+
     inKinematicSub = false;
     currentKinematicSub = 0;
     prevMainNavY = 0;
@@ -56,6 +69,13 @@ void menuInit() {
     choiceMade = false;
     finalSelection = { -1, -1 };
 }
+
+
+
+
+
+
+
 
 // =============================================================================
 // menuSelectionAvailable()
@@ -82,6 +102,7 @@ void menuResetSelection() {
 // =============================================================================
 // Zeichnet das Hauptmenü auf displayPtr
 // =============================================================================
+
 static void drawMainMenu() {
     if (!displayPtr) return;
     displayPtr->clearBuffer();
@@ -116,9 +137,15 @@ static void drawMainMenu() {
     displayPtr->sendBuffer();
 }
 
+
+
+
+
+
 // =============================================================================
 // Zeichnet das Homing-Untermenü
 // =============================================================================
+
 static void drawHomingSubMenu() {
     if (!displayPtr) return;
     displayPtr->clearBuffer();
@@ -152,9 +179,15 @@ static void drawHomingSubMenu() {
     displayPtr->sendBuffer();
 }
 
+
+
+
+
+
 // =============================================================================
 // Zeichnet das Kinematic-Untermenü
 // =============================================================================
+
 static void drawKinematicSubMenu() {
     if (!displayPtr) return;
     displayPtr->clearBuffer();
@@ -187,6 +220,10 @@ static void drawKinematicSubMenu() {
     displayPtr->sendBuffer();
 }
 
+
+
+
+
 // =============================================================================
 // menuUpdate()
 // =============================================================================
@@ -196,11 +233,13 @@ void menuUpdate() {
 
     // 1) Eingänge aktualisieren
     updateRemoteInputs();
+
     const RemoteState* rs = getRemoteStatePointer();
     bool pressed1 = rs->button1 && !prevButton1;
     bool pressed2 = rs->button2 && !prevButton2;
     prevButton1 = rs->button1;
     prevButton2 = rs->button2;
+
 
     // 2) Navigation im Menü
     // Hauptmenü vs. Untermenüs:
@@ -218,6 +257,7 @@ void menuUpdate() {
             }
         }
         prevMainNavY = dirY;
+
 
         // Auswahl per Button1 (Flanke)
         if (pressed1) {
@@ -241,6 +281,7 @@ void menuUpdate() {
                     DEBUG_PRINTLN(currentMain);
                     break;
             }
+
         }
 
         // Zeichne Hauptmenü
@@ -259,6 +300,7 @@ void menuUpdate() {
             }
         }
         prevSubNavY = dirY;
+
 
         // Auswahl mit Button1 oder sofort zurück mit Button2
         if (pressed1) {
@@ -283,6 +325,7 @@ void menuUpdate() {
             DEBUG_PRINTLN("Homing menu exit");
         }
 
+
         drawHomingSubMenu();
         return;
     }
@@ -298,6 +341,7 @@ void menuUpdate() {
             }
         }
         prevSubNavY = dirY;
+
 
         // Auswahl mit Button1 oder Zurück mit Button2
         if (pressed1) {
@@ -321,6 +365,7 @@ void menuUpdate() {
             prevSubNavY = 0;
             DEBUG_PRINTLN("Kinematic menu exit");
         }
+
 
         drawKinematicSubMenu();
         return;

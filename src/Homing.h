@@ -28,6 +28,11 @@ constexpr float SHOULDER_MAX_ANGLE_DEG =  150.0f;
 constexpr float ELBOW_MAX_ANGLE_DEG    =  120.0f; 
 constexpr float WRIST_PITCH_MAX_DEG    =  180.0f; 
 
+
+// --- Backoff- und Timeout-Parameter ---
+// Wie viele Schritte sollen wir nach Endschalter-Erkennung zurueckfahren, damit
+// wir einen definierten Wiederanlauf-Punkt haben.
+// Der konkrete Wert ist in Robo_Config_V1.h als HOMING_BACKOFF_STEPS festgelegt.
 //
 // --- Backoff- und Timeout-Parameter ---
 // Wie viele Schritte sollen wir nach Endschalter-Erkennung zurueckfahren, damit
@@ -37,6 +42,7 @@ constexpr float WRIST_PITCH_MAX_DEG    =  180.0f;
 // Zusätzliche Sicherheit: Maximale Zeit für eine Homingfahrt, um Endlosschleifen
 // bei defekten Endschaltern zu vermeiden (in Millisekunden).
 constexpr unsigned long MAX_HOMING_TIME_MS = 60000; // 1 Minute
+
 
 //
 // --- Funktionen und globale Flags ---
@@ -49,14 +55,17 @@ constexpr unsigned long MAX_HOMING_TIME_MS = 60000; // 1 Minute
  *
  * @param  axis  Index der Achse (0 = Basis, 1 = Schulter, 2 = Ellbogen, 3 = Wrist Pitch, …).
  */
+
 // Rueckgabe: true bei erfolgreichem Homing, false bei Timeout
 bool homeAxis(uint8_t axis);
+
 
 /**
  * @brief  Hintereinander alle Axes 0..3 (bzw. 0..5, je nach Mechanik) homen. 
  *         Nach jeder erfolgreichen Achse speichert es currentJointAngles[axis] = HOMEPOS_RAD.
  *         Am Ende fährt er in die vorgegebenen Kalibrierwinkel (siehe Homing.cpp).
  */
+
 // Homt alle definierten Achsen hintereinander. Liefert false, wenn eine Achse
 // nicht innerhalb des Zeitlimits homed.
 bool homeAllAxes();
@@ -64,6 +73,7 @@ bool homeAllAxes();
 /**
  * @brief  Checkt für eine Achse, ob deren Endschalter ausgelöst ist.
  *         Bei NC-Schaltern mit Pull-Up bedeutet HIGH = gedrückt. Rückgabe: true bei HIGH.
+
  *         Implementierung siehe Homing.cpp.
  */
 bool isEndstopPressed(uint8_t axis);

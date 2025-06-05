@@ -42,10 +42,10 @@ bool isMultiMoveActive();
 void stopAllSteppers();
 
 /**
- * @brief  Interrupt-Service-Routine für STEP-Puls-Generierung (Multi & JointMode).
+ * @brief  Interrupt-Service-Routine für STEP-Puls-Generierung im JointMode.
  *
- *   - Koordiniert via multiStepperGroup.runSpeedToPosition()
  *   - Erzeugt Einzel-Achsen Pulse (JointMode) anhand targetSpeeds[] & stepInterval[].
+ *   - Koordinierte Bewegungen werden in updateAllSteppers() abgearbeitet.
  */
 void stepperISR();
 
