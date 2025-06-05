@@ -214,11 +214,13 @@ void loop() {
           returnToMenu = true;
         }
       }
+
       showMessage("Joint Mode", "done");
       jointModeStop();
 
       currentStatus = STATUS_IDLE;
       setStatusLED(currentStatus);
+
     }
     // KinematicMode
     else if (sel.mainIndex == MM_KINEMATIC) {
@@ -235,11 +237,13 @@ void loop() {
           returnToMenu = true;
         }
       }
+
       showMessage("Kinematic", "done");
       kinematicModeStop();
 
       currentStatus = STATUS_IDLE;
       setStatusLED(currentStatus);
+
     }
     // G-Code Mode (Platzhalter)
     else if (sel.mainIndex == MM_GCODE) {
