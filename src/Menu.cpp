@@ -245,7 +245,7 @@ void menuUpdate() {
         }
         prevSubNavY = dirY;
 
-        // Auswahl oder Zurück
+        // Auswahl mit Button1 oder sofort zurück mit Button2
         if (pressed1) {
             if (currentHomingSub == HS_HOMING_BACK) {
                 // Zurück ins Hauptmenü
@@ -259,6 +259,11 @@ void menuUpdate() {
                 Serial.print("Homing select sub=");
                 Serial.println(currentHomingSub);
             }
+        }
+        if (pressed2) {
+            inHomingSub = false;
+            currentHomingSub = 0;
+            Serial.println("Homing menu exit");
         }
 
         drawHomingSubMenu();
@@ -277,7 +282,7 @@ void menuUpdate() {
         }
         prevSubNavY = dirY;
 
-        // Auswahl oder Zurück
+        // Auswahl mit Button1 oder Zurück mit Button2
         if (pressed1) {
             if (currentKinematicSub == KS_KIN_BACK) {
                 // Zurück ins Hauptmenü
@@ -291,6 +296,11 @@ void menuUpdate() {
                 Serial.print("Kinematic select sub=");
                 Serial.println(currentKinematicSub);
             }
+        }
+        if (pressed2) {
+            inKinematicSub = false;
+            currentKinematicSub = 0;
+            Serial.println("Kinematic menu exit");
         }
 
         drawKinematicSubMenu();

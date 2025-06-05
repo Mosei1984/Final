@@ -148,8 +148,9 @@ void setup() {
   configureSteppers();
   setupMultiStepper();
 
-  // --- 5) STEP-Timer (1 kHz) ---
-  stepTimer.begin(stepperISR, 1000);
+  // --- 5) STEP-Timer (2 kHz) ---
+  // Hoehere Frequenz erlaubt schnellere Schrittgeschwindigkeiten
+  stepTimer.begin(stepperISR, 500);
 
   // --- 6) Menü initialisieren ---
   currentStatus = STATUS_MENU;
