@@ -114,6 +114,7 @@ static void showMessage(const char* line1, const char* line2) {
   displayPtr->sendBuffer();
 }
 
+#if 0
 // Kleine Hilfsfunktion, um eine zweizeilige Meldung auf dem Display anzuzeigen
 static void showMessage(const char* line1, const char* line2) {
   if (!displayPtr) return;
@@ -122,7 +123,7 @@ static void showMessage(const char* line1, const char* line2) {
   displayPtr->setCursor(0, 20);
   displayPtr->print(line1);
   displayPtr->setCursor(0, 40);
-  displayPtr->print(line2);
+displayPtr->print(line2);
   displayPtr->sendBuffer();
 }
 
@@ -225,6 +226,7 @@ static void showMessage(const char* line1, const char* line2) {
 // -----------------------------------------------------------------------------
 // Wrapper für Homing-Untermenüaktionen
 // -----------------------------------------------------------------------------
+#endif
 
 static void handleHomingSub(int8_t subIndex) {
   currentStatus = STATUS_HOMING;
@@ -432,3 +434,4 @@ void loop() {
   updateAllSteppers();
   delay(10);
 }
+
