@@ -1,0 +1,7 @@
+PROJECT_NAME           = "ARCTOS-RA6DOF"
+OPTIMIZE_OUTPUT_FOR_C  = YES
+EXTRACT_ALL            = YES
+GENERATE_XML           = YES
+RECURSIVE              = YES
+INPUT                  = include src
+FILE_PATTERNS          = *.h *.hpp *.c *.cpp
